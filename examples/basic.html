@@ -1,0 +1,53 @@
+<!--
+  Open over a local server (ES modules do not load from file://):
+    npx serve .   then visit /examples/basic.html
+-->
+<button data-pg-target-functions="toggle-menu">Menu</button>
+<button data-pg-target-functions="toggle-search">Search</button>
+<button data-pg-target-functions="open-menu if-opened-search-close-search">
+    Menu, closing search
+</button>
+
+<div
+    data-pg-target="menu"
+    data-pg-active="false"
+    data-pg-target-functions="close-menu"
+    class="backdrop"
+></div>
+<aside data-pg-target="menu" data-pg-active="false" data-pg-scroll-lock="true">
+    <button data-pg-target-functions="close-menu">Close</button>
+</aside>
+
+<div data-pg-target="search" data-pg-active="false" data-pg-scroll-lock="true">
+    <input type="search" placeholder="Search…" />
+</div>
+
+<style>
+    [data-pg-target="menu"].backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgb(0 0 0 / 0.4);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+    }
+    [data-pg-target="menu"].backdrop[data-pg-active="true"] {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    aside[data-pg-target="menu"] {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 20rem;
+        translate: -100%;
+        transition: translate 0.3s;
+    }
+    aside[data-pg-target="menu"][data-pg-active="true"] {
+        translate: 0;
+    }
+</style>
+
+<script type="module">
+    import { initTargetFunctions } from "../dist/index.js";
+    initTargetFunctions();
+</script>
