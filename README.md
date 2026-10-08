@@ -9,8 +9,12 @@ state. One file, no dependencies, framework-agnostic.
 <aside data-pg-target="menu" data-pg-active="false">…</aside>
 ```
 
+```sh
+npm install github:omisilli/target-functions#v1.0.0
+```
+
 ```ts
-import { initTargetFunctions } from "./targetFunctions";
+import { initTargetFunctions } from "@plusguard/target-functions";
 
 initTargetFunctions();
 ```
@@ -26,7 +30,7 @@ initTargetFunctions();
 `dist/` is committed. After editing `index.ts`, rebuild it:
 
 ```sh
-npx tsc index.ts --outDir dist --declaration --target es2020 --module es2020 --lib dom,es2020 --strict
+npx -p typescript tsc index.ts --outDir dist --declaration --target es2020 --module es2020 --lib dom,es2020 --strict
 ```
 
 ## Attributes

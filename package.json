@@ -1,0 +1,20 @@
+{
+    "name": "@plusguard/target-functions",
+    "version": "1.0.0",
+    "description": "Open, close and toggle elements by name from HTML attributes. Zero dependencies, framework-agnostic, accessible.",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+    },
+    "files": ["dist", "index.ts", "README.md", "LICENSE"],
+    "sideEffects": false,
+    "scripts": {
+        "build": "npx -p typescript tsc index.ts --outDir dist --declaration --target es2020 --module es2020 --lib dom,es2020 --strict"
+    },
+    "license": "MIT",
+    "author": "PlusGuard",
+    "repository": { "type": "git", "url": "git+https://github.com/omisilli/target-functions.git" },
+    "keywords": ["data-attributes", "toggle", "drawer", "dropdown", "accessibility", "vanilla"]
+}
