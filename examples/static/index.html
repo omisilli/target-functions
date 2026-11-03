@@ -1,7 +1,4 @@
-<!--
-  Open over a local server (ES modules do not load from file://):
-    npx serve .   then visit /examples/basic.html
--->
+<!-- Open by double-clicking: the module loads from jsDelivr, not from ../dist. -->
 <button data-pg-target-functions="toggle-menu">Menu</button>
 <button data-pg-target-functions="toggle-search">Search</button>
 <button data-pg-target-functions="open-menu if-opened-search-close-search">
@@ -48,6 +45,6 @@
 </style>
 
 <script type="module">
-    import { initTargetFunctions } from "../dist/index.js";
+    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@1/dist/index.js";
     initTargetFunctions();
 </script>

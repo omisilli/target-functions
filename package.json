@@ -1,6 +1,6 @@
 {
     "name": "@plusguard/target-functions",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Open, close and toggle elements by name from HTML attributes. Zero dependencies, framework-agnostic, accessible.",
     "type": "module",
     "main": "./dist/index.js",

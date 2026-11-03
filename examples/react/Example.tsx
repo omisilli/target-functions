@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { initTargetFunctions } from "../index";
+import { initTargetFunctions } from "@plusguard/target-functions";
 
 /* Mount once, high in the tree. */
 export function TargetFunctions() {

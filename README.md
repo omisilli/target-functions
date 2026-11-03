@@ -10,7 +10,7 @@ state. One file, no dependencies, framework-agnostic.
 ```
 
 ```sh
-npm install github:omisilli/target-functions#v1.0.0
+npm install github:omisilli/target-functions#v1.0.1
 ```
 
 ```ts
@@ -19,6 +19,22 @@ import { initTargetFunctions } from "@plusguard/target-functions";
 initTargetFunctions();
 ```
 
+### Without a build step
+
+Load it straight from jsDelivr — no install, and the page works when opened
+by double-clicking:
+
+```html
+<script type="module">
+    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v1.0.1/dist/index.js";
+
+    initTargetFunctions();
+</script>
+```
+
+Pin the version (`@v1.0.1`) on a live site. A pinned URL never changes;
+`@1` follows the newest 1.x release.
+
 ## Files
 
 | File              | For                                                              |
@@ -26,6 +42,9 @@ initTargetFunctions();
 | `index.ts`        | TypeScript source — import it directly in a TS / bundler project |
 | `dist/index.js`   | Compiled ES module — plain HTML, no build step                   |
 | `dist/index.d.ts` | Types for `dist/index.js`                                        |
+
+Importing `dist/index.js` from your own files? Serve the page over HTTP —
+browsers block module imports on `file://`.
 
 `dist/` is committed. After editing `index.ts`, rebuild it:
 
@@ -116,7 +135,8 @@ JSX sets the starting value (`data-pg-active="false"`) and must not change it
 afterwards; from then on targetFunctions owns it. If a re-render writes a
 different value, React wins and the state is lost.
 
-See [`examples/react.tsx`](examples/react.tsx).
+See [`examples/react/Example.tsx`](examples/react/Example.tsx). A plain HTML
+version is in [`examples/static/index.html`](examples/static/index.html).
 
 ## Limits
 
