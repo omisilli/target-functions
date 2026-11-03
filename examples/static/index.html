@@ -7,7 +7,7 @@
         <title>targetFunctions — example</title>
         <link
             rel="stylesheet"
-            href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@2/index.css"
+            href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v2.0.0/index.css"
         />
         <style>
             :root {
@@ -162,6 +162,34 @@
                 color: var(--muted);
             }
 
+            /* Accordion: answers named faq1 / faq2, and both "answers" */
+            .faq {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
+            .faq-q {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .faq-q[aria-expanded="true"] {
+                background: var(--surface);
+                color: inherit;
+                border-color: var(--accent);
+            }
+            .faq-a {
+                width: 100%;
+                padding: 0 1.25rem;
+                color: var(--muted);
+            }
+            .faq-a[data-pg-target-active="false"] {
+                display: none;
+            }
+            .small {
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+
             /* Menu: drawer + backdrop, both named "menu" */
             .backdrop {
                 position: fixed;
@@ -291,7 +319,60 @@
                         Run
                     </button>
                 </li>
+                <li>
+                    <div>
+                        <code>if-closed-menu-open-search</code>
+                        <p>Opens search — but only while the menu is closed.</p>
+                    </div>
+                    <button class="btn" data-pg-target-functions="if-closed-menu-open-search">
+                        Run
+                    </button>
+                </li>
             </ul>
+
+            <h2>Several names, no scroll lock</h2>
+            <p class="lead small">
+                A target may carry more than one name. These two answers are each their own
+                <code>faq1</code> / <code>faq2</code>, and both are also <code>answers</code> — so
+                one command closes them all. They lock nothing: Escape and focus moves are kept for
+                dialog-like targets, so an accordion behaves like an accordion.
+            </p>
+            <div class="faq">
+                <button
+                    class="btn faq-q"
+                    data-pg-target-functions="toggle-faq1"
+                    aria-controls="faq1"
+                >
+                    What is a target?
+                </button>
+                <div
+                    class="faq-a"
+                    id="faq1"
+                    data-pg-target="faq1 answers"
+                    data-pg-target-active="false"
+                >
+                    Any element with <code>data-pg-target</code>. Commands open, close and toggle it
+                    by name.
+                </div>
+                <button
+                    class="btn faq-q"
+                    data-pg-target-functions="toggle-faq2"
+                    aria-controls="faq2"
+                >
+                    Can two targets share a name?
+                </button>
+                <div
+                    class="faq-a"
+                    id="faq2"
+                    data-pg-target="faq2 answers"
+                    data-pg-target-active="false"
+                >
+                    Yes — the drawer and its backdrop are both <code>menu</code>. A command reaches
+                    every target with that name.
+                </div>
+                <button class="btn" data-pg-target-functions="open-answers">Open all</button>
+                <button class="btn" data-pg-target-functions="close-answers">Close all</button>
+            </div>
 
             <h2>Things to notice</h2>
             <ul class="tips">
@@ -342,7 +423,7 @@
         </div>
 
         <script type="module">
-            import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@2/dist/index.js";
+            import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v2.0.0/dist/index.js";
 
             // A minimal locker: the page stays still until every open target has closed.
             const holders = new Set();
