@@ -6,15 +6,16 @@ state. One file, no dependencies, framework-agnostic.
 ```html
 <button data-pg-target-functions="toggle-menu">Menu</button>
 
-<aside data-pg-target="menu" data-pg-active="false">…</aside>
+<aside data-pg-target="menu" data-pg-target-active="false">…</aside>
 ```
 
 ```sh
-npm install github:omisilli/target-functions#v1.0.1
+npm install github:omisilli/target-functions#v2.0.0
 ```
 
 ```ts
 import { initTargetFunctions } from "@plusguard/target-functions";
+import "@plusguard/target-functions/index.css";
 
 initTargetFunctions();
 ```
@@ -25,21 +26,27 @@ Load it straight from jsDelivr — no install, and the page works when opened
 by double-clicking:
 
 ```html
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v2.0.0/index.css"
+/>
+
 <script type="module">
-    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v1.0.1/dist/index.js";
+    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v2.0.0/dist/index.js";
 
     initTargetFunctions();
 </script>
 ```
 
-Pin the version (`@v1.0.1`) on a live site. A pinned URL never changes;
-`@1` follows the newest 1.x release.
+Pin the version (`@v2.0.0`) on a live site. A pinned URL never changes;
+`@2` follows the newest 2.x release.
 
 ## Files
 
 | File              | For                                                              |
 | ----------------- | ---------------------------------------------------------------- |
 | `index.ts`        | TypeScript source — import it directly in a TS / bundler project |
+| `index.css`       | The CSS half — empty for now, see below                          |
 | `dist/index.js`   | Compiled ES module — plain HTML, no build step                   |
 | `dist/index.d.ts` | Types for `dist/index.js`                                        |
 
@@ -54,22 +61,31 @@ npx -p typescript tsc index.ts --outDir dist --declaration --target es2020 --mod
 
 ## Attributes
 
-| Attribute                  | On      | Meaning                                                       |
-| -------------------------- | ------- | ------------------------------------------------------------- |
-| `data-pg-target-functions` | trigger | Commands to run on click, space separated                     |
-| `data-pg-target`           | target  | Name(s) of the target, space separated                        |
-| `data-pg-active`           | target  | `"true"` or `"false"` — the state, written by targetFunctions |
-| `data-pg-scroll-lock`      | target  | `"true"` → lock the page while this target is open            |
+| Attribute                    | On      | Meaning                                                       |
+| ---------------------------- | ------- | ------------------------------------------------------------- |
+| `data-pg-target-functions`   | trigger | Commands to run on click, space separated                     |
+| `data-pg-target`             | target  | Name(s) of the target, space separated                        |
+| `data-pg-target-active`      | target  | `"true"` or `"false"` — the state, written by targetFunctions |
+| `data-pg-target-scroll-lock` | target  | `"true"` → lock the page while this target is open            |
 
 Style the open state with the attribute, not a class:
 
 ```css
-[data-pg-target="menu"][data-pg-active="true"] {
+[data-pg-target="menu"][data-pg-target-active="true"] {
     transform: none;
 }
 ```
 
-With Tailwind: `data-[pg-active=true]:translate-x-0`.
+With Tailwind: `data-[pg-target-active=true]:translate-x-0`.
+
+Every attribute starts with `data-pg-target`, so none of them can collide
+with another library's names.
+
+## CSS
+
+`index.css` is empty: how an open target looks is your page's business.
+Import it anyway. If the package ever needs CSS of its own, your page
+already loads it and nothing changes on your side.
 
 ## Commands
 
@@ -96,7 +112,7 @@ backdrop together.
 ## Scroll lock
 
 targetFunctions does not lock the page itself. Pass the two callbacks you
-want called when a `data-pg-scroll-lock="true"` target opens and closes:
+want called when a `data-pg-target-scroll-lock="true"` target opens and closes:
 
 ```ts
 initTargetFunctions({
@@ -111,7 +127,7 @@ Without callbacks, those targets simply open without locking.
 
 ## Accessibility
 
-Targets with `data-pg-scroll-lock="true"` are treated as dialogs:
+Targets with `data-pg-target-scroll-lock="true"` are treated as dialogs:
 
 - **Focus** moves to the first focusable element inside when it opens, and
   back to the button that opened it when it closes.
@@ -131,8 +147,8 @@ Call `initTargetFunctions` once, in an effect — it returns its own cleanup:
 useEffect(() => initTargetFunctions(), []);
 ```
 
-JSX sets the starting value (`data-pg-active="false"`) and must not change it
-afterwards; from then on targetFunctions owns it. If a re-render writes a
+JSX sets the starting value (`data-pg-target-active="false"`) and must not
+change it afterwards; from then on targetFunctions owns it. If a re-render writes a
 different value, React wins and the state is lost.
 
 See [`examples/react/Example.tsx`](examples/react/Example.tsx). A plain HTML
@@ -142,5 +158,18 @@ version is in [`examples/static/index.html`](examples/static/index.html).
 
 - Target names must not contain `-` — commands are split on it.
 - One listener on `document` handles every trigger, including ones rendered
-  later. Calling `initTargetFunctions` twice adds a second listener; call it
-  once.
+  later. Call `initTargetFunctions` once. If it is called again before the
+  first cleanup runs (React remounting in development), only the newest call
+  answers clicks, and the older cleanup does not switch it off.
+
+## Upgrading from 1.x
+
+Two attributes were renamed so every name starts with `data-pg-target`:
+
+| 1.x                   | 2.x                          |
+| --------------------- | ---------------------------- |
+| `data-pg-active`      | `data-pg-target-active`      |
+| `data-pg-scroll-lock` | `data-pg-target-scroll-lock` |
+
+Rename them in your markup and CSS (Tailwind: `data-[pg-active=true]:` →
+`data-[pg-target-active=true]:`), and import `index.css`.

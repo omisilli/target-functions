@@ -5,6 +5,10 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>targetFunctions — example</title>
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@2/index.css"
+        />
         <style>
             :root {
                 --bg: #f6f6f4;
@@ -168,7 +172,7 @@
                 pointer-events: none;
                 transition: opacity 0.3s;
             }
-            .backdrop[data-pg-active="true"] {
+            .backdrop[data-pg-target-active="true"] {
                 opacity: 1;
                 pointer-events: auto;
             }
@@ -186,7 +190,7 @@
                 translate: -105%;
                 transition: translate 0.4s var(--ease);
             }
-            .drawer[data-pg-active="true"] {
+            .drawer[data-pg-target-active="true"] {
                 translate: 0;
             }
             .drawer header {
@@ -218,7 +222,7 @@
                 translate: 0 -110%;
                 transition: translate 0.35s var(--ease);
             }
-            .search[data-pg-active="true"] {
+            .search[data-pg-target-active="true"] {
                 translate: 0;
             }
             .search input {
@@ -306,14 +310,14 @@
         <div
             class="backdrop"
             data-pg-target="menu"
-            data-pg-active="false"
+            data-pg-target-active="false"
             data-pg-target-functions="close-menu"
         ></div>
         <aside
             class="drawer"
             data-pg-target="menu"
-            data-pg-active="false"
-            data-pg-scroll-lock="true"
+            data-pg-target-active="false"
+            data-pg-target-scroll-lock="true"
         >
             <header>
                 <span class="brand">Menu</span>
@@ -330,15 +334,15 @@
         <div
             class="search"
             data-pg-target="search"
-            data-pg-active="false"
-            data-pg-scroll-lock="true"
+            data-pg-target-active="false"
+            data-pg-target-scroll-lock="true"
         >
             <input type="search" placeholder="Search…" aria-label="Search" />
             <button class="btn" data-pg-target-functions="close-search">Cancel</button>
         </div>
 
         <script type="module">
-            import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@1/dist/index.js";
+            import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@2/dist/index.js";
 
             // A minimal locker: the page stays still until every open target has closed.
             const holders = new Set();

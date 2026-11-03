@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { initTargetFunctions } from "@plusguard/target-functions";
+import "@plusguard/target-functions/index.css";
 
 /* Mount once, high in the tree. */
 export function TargetFunctions() {
@@ -19,11 +20,15 @@ export function Example() {
 
             <div
                 data-pg-target="menu"
-                data-pg-active="false"
+                data-pg-target-active="false"
                 data-pg-target-functions="close-menu"
                 className="backdrop"
             />
-            <aside data-pg-target="menu" data-pg-active="false" data-pg-scroll-lock="true">
+            <aside
+                data-pg-target="menu"
+                data-pg-target-active="false"
+                data-pg-target-scroll-lock="true"
+            >
                 <button data-pg-target-functions="close-menu">Close</button>
                 <nav>…</nav>
             </aside>

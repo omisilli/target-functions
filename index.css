@@ -1,0 +1,8 @@
+/*
+ * targetFunctions — the CSS half. Empty on purpose.
+ *
+ * targetFunctions only writes data-pg-target-active; how an open target
+ * looks is the page's business. The file exists so that a theme imports it
+ * from day one: if the package ever needs CSS of its own, every theme
+ * already loads it and nothing has to change on their side.
+ */

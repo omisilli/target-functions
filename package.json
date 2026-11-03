@@ -1,15 +1,16 @@
 {
     "name": "@plusguard/target-functions",
-    "version": "1.0.1",
+    "version": "2.0.0",
     "description": "Open, close and toggle elements by name from HTML attributes. Zero dependencies, framework-agnostic, accessible.",
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
-        ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+        ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+        "./index.css": "./index.css"
     },
-    "files": ["dist", "index.ts", "README.md", "LICENSE"],
-    "sideEffects": false,
+    "files": ["dist", "index.ts", "index.css", "README.md", "LICENSE"],
+    "sideEffects": ["*.css"],
     "scripts": {
         "build": "npx -p typescript tsc index.ts --outDir dist --declaration --target es2020 --module es2020 --lib dom,es2020 --strict"
     },
