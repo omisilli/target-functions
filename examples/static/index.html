@@ -1,50 +1,361 @@
+<!doctype html>
 <!-- Open by double-clicking: the module loads from jsDelivr, not from ../dist. -->
-<button data-pg-target-functions="toggle-menu">Menu</button>
-<button data-pg-target-functions="toggle-search">Search</button>
-<button data-pg-target-functions="open-menu if-opened-search-close-search">
-    Menu, closing search
-</button>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>targetFunctions — example</title>
+        <style>
+            :root {
+                --bg: #f6f6f4;
+                --surface: #ffffff;
+                --fg: #18181b;
+                --muted: #6b6b72;
+                --line: #e4e4e0;
+                --accent: #2f5bea;
+                --on-accent: #ffffff;
+                --code-bg: #f0f0ec;
+                --shadow: 0 12px 40px rgb(0 0 0 / 0.12);
+                --ease: cubic-bezier(0.22, 1, 0.36, 1);
+                color-scheme: light dark;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --bg: #111113;
+                    --surface: #1b1b1f;
+                    --fg: #ededef;
+                    --muted: #9a9aa3;
+                    --line: #2c2c31;
+                    --accent: #7c9cff;
+                    --on-accent: #0d0d10;
+                    --code-bg: #26262b;
+                    --shadow: 0 12px 40px rgb(0 0 0 / 0.5);
+                }
+            }
 
-<div
-    data-pg-target="menu"
-    data-pg-active="false"
-    data-pg-target-functions="close-menu"
-    class="backdrop"
-></div>
-<aside data-pg-target="menu" data-pg-active="false" data-pg-scroll-lock="true">
-    <button data-pg-target-functions="close-menu">Close</button>
-</aside>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+            }
+            body {
+                font:
+                    16px/1.6 system-ui,
+                    -apple-system,
+                    "Segoe UI",
+                    Roboto,
+                    sans-serif;
+                color: var(--fg);
+                background: var(--bg);
+            }
+            code {
+                font:
+                    0.85em/1.4 ui-monospace,
+                    SFMono-Regular,
+                    Menlo,
+                    monospace;
+                background: var(--code-bg);
+                padding: 0.15em 0.4em;
+                border-radius: 0.35em;
+            }
+            button {
+                font: inherit;
+                color: inherit;
+                cursor: pointer;
+            }
 
-<div data-pg-target="search" data-pg-active="false" data-pg-scroll-lock="true">
-    <input type="search" placeholder="Search…" />
-</div>
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.55rem 1rem;
+                border: 1px solid var(--line);
+                border-radius: 0.6rem;
+                background: var(--surface);
+                transition:
+                    border-color 0.15s,
+                    background 0.15s;
+            }
+            .btn:hover {
+                border-color: var(--muted);
+            }
+            .btn[aria-expanded="true"] {
+                background: var(--accent);
+                border-color: var(--accent);
+                color: var(--on-accent);
+            }
 
-<style>
-    [data-pg-target="menu"].backdrop {
-        position: fixed;
-        inset: 0;
-        background: rgb(0 0 0 / 0.4);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s;
-    }
-    [data-pg-target="menu"].backdrop[data-pg-active="true"] {
-        opacity: 1;
-        pointer-events: auto;
-    }
-    aside[data-pg-target="menu"] {
-        position: fixed;
-        inset: 0 auto 0 0;
-        width: 20rem;
-        translate: -100%;
-        transition: translate 0.3s;
-    }
-    aside[data-pg-target="menu"][data-pg-active="true"] {
-        translate: 0;
-    }
-</style>
+            /* Top bar */
+            .bar {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                padding: 0.75rem 1.25rem;
+                background: color-mix(in srgb, var(--bg) 85%, transparent);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid var(--line);
+            }
+            .brand {
+                font-weight: 700;
+                letter-spacing: -0.01em;
+            }
 
-<script type="module">
-    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@1/dist/index.js";
-    initTargetFunctions();
-</script>
+            /* Page */
+            main {
+                max-width: 46rem;
+                margin: 0 auto;
+                padding: 3rem 1.25rem 6rem;
+            }
+            h1 {
+                font-size: clamp(2rem, 6vw, 3rem);
+                line-height: 1.1;
+                letter-spacing: -0.03em;
+            }
+            h2 {
+                font-size: 1.1rem;
+                margin: 3rem 0 1rem;
+            }
+            .lead {
+                margin-top: 1rem;
+                color: var(--muted);
+                font-size: 1.1rem;
+            }
+            .demo {
+                display: grid;
+                gap: 0.75rem;
+                padding: 0;
+            }
+            .demo li {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.75rem;
+                padding: 1rem 1.25rem;
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 0.9rem;
+                list-style: none;
+            }
+            .demo p {
+                color: var(--muted);
+                font-size: 0.9rem;
+            }
+            .tips li {
+                margin: 0.4rem 0 0 1.25rem;
+                color: var(--muted);
+            }
+            .filler {
+                height: 60vh;
+                margin-top: 3rem;
+                border: 1px dashed var(--line);
+                border-radius: 0.9rem;
+                display: grid;
+                place-items: center;
+                color: var(--muted);
+            }
+
+            /* Menu: drawer + backdrop, both named "menu" */
+            .backdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 20;
+                background: rgb(0 0 0 / 0.45);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s;
+            }
+            .backdrop[data-pg-active="true"] {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            .drawer {
+                position: fixed;
+                inset: 0 auto 0 0;
+                z-index: 30;
+                width: min(20rem, 85vw);
+                padding: 1.25rem;
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+                background: var(--surface);
+                box-shadow: var(--shadow);
+                translate: -105%;
+                transition: translate 0.4s var(--ease);
+            }
+            .drawer[data-pg-active="true"] {
+                translate: 0;
+            }
+            .drawer header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .drawer nav a {
+                display: block;
+                padding: 0.6rem 0.75rem;
+                border-radius: 0.5rem;
+                color: inherit;
+                text-decoration: none;
+            }
+            .drawer nav a:hover {
+                background: var(--code-bg);
+            }
+
+            /* Search: drops from the top */
+            .search {
+                position: fixed;
+                inset: 0 0 auto;
+                z-index: 40;
+                display: flex;
+                gap: 0.75rem;
+                padding: 1rem 1.25rem;
+                background: var(--surface);
+                box-shadow: var(--shadow);
+                translate: 0 -110%;
+                transition: translate 0.35s var(--ease);
+            }
+            .search[data-pg-active="true"] {
+                translate: 0;
+            }
+            .search input {
+                flex: 1;
+                font: inherit;
+                color: inherit;
+                padding: 0.55rem 0.9rem;
+                border: 1px solid var(--line);
+                border-radius: 0.6rem;
+                background: var(--bg);
+            }
+            .search input:focus {
+                outline: 2px solid var(--accent);
+                outline-offset: 1px;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="bar">
+            <button class="btn" data-pg-target-functions="toggle-menu">☰ Menu</button>
+            <span class="brand">targetFunctions</span>
+            <button class="btn" data-pg-target-functions="toggle-search">Search</button>
+        </header>
+
+        <main>
+            <h1>Open, close and toggle by name.</h1>
+            <p class="lead">
+                Every button on this page is plain HTML. The behaviour lives in one attribute:
+                <code>data-pg-target-functions</code>.
+            </p>
+
+            <h2>Try the commands</h2>
+            <ul class="demo">
+                <li>
+                    <div>
+                        <code>toggle-menu</code>
+                        <p>Opens the drawer, or closes it if open.</p>
+                    </div>
+                    <button class="btn" data-pg-target-functions="toggle-menu">Run</button>
+                </li>
+                <li>
+                    <div>
+                        <code>toggle-search</code>
+                        <p>Drops the search bar from the top.</p>
+                    </div>
+                    <button class="btn" data-pg-target-functions="toggle-search">Run</button>
+                </li>
+                <li>
+                    <div>
+                        <code>open-menu if-opened-search-close-search</code>
+                        <p>Opens the menu and closes search, if search was open.</p>
+                    </div>
+                    <button
+                        class="btn"
+                        data-pg-target-functions="open-menu if-opened-search-close-search"
+                    >
+                        Run
+                    </button>
+                </li>
+                <li>
+                    <div>
+                        <code>close-menu open-search</code>
+                        <p>Two commands, left to right.</p>
+                    </div>
+                    <button class="btn" data-pg-target-functions="close-menu open-search">
+                        Run
+                    </button>
+                </li>
+            </ul>
+
+            <h2>Things to notice</h2>
+            <ul class="tips">
+                <li><kbd>Esc</kbd> closes whatever was opened last.</li>
+                <li>Focus moves into the drawer, and back to your button when it closes.</li>
+                <li>While anything is open, the page behind it does not scroll.</li>
+                <li>
+                    The two top-bar buttons light up while their target is open
+                    (<code>aria-expanded</code>).
+                </li>
+            </ul>
+
+            <div class="filler">Scroll space — try scrolling with the menu open.</div>
+        </main>
+
+        <div
+            class="backdrop"
+            data-pg-target="menu"
+            data-pg-active="false"
+            data-pg-target-functions="close-menu"
+        ></div>
+        <aside
+            class="drawer"
+            data-pg-target="menu"
+            data-pg-active="false"
+            data-pg-scroll-lock="true"
+        >
+            <header>
+                <span class="brand">Menu</span>
+                <button class="btn" data-pg-target-functions="close-menu">Close</button>
+            </header>
+            <nav>
+                <a href="#">Home</a>
+                <a href="#">Collections</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+            </nav>
+        </aside>
+
+        <div
+            class="search"
+            data-pg-target="search"
+            data-pg-active="false"
+            data-pg-scroll-lock="true"
+        >
+            <input type="search" placeholder="Search…" aria-label="Search" />
+            <button class="btn" data-pg-target-functions="close-search">Cancel</button>
+        </div>
+
+        <script type="module">
+            import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@1/dist/index.js";
+
+            // A minimal locker: the page stays still until every open target has closed.
+            const holders = new Set();
+            const sync = () => {
+                document.documentElement.style.overflow = holders.size ? "clip" : "";
+            };
+
+            initTargetFunctions({
+                lock: (source) => {
+                    holders.add(source);
+                    sync();
+                },
+                unlock: (source) => {
+                    holders.delete(source);
+                    sync();
+                },
+            });
+        </script>
+    </body>
+</html>
