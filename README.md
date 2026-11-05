@@ -10,7 +10,7 @@ state. One file, no dependencies, framework-agnostic.
 ```
 
 ```sh
-npm install github:omisilli/target-functions#v3.0.0
+npm install github:omisilli/target-functions#v3.1.0
 ```
 
 ```ts
@@ -28,18 +28,18 @@ by double-clicking:
 ```html
 <link
     rel="stylesheet"
-    href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.0.0/index.css"
+    href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.1.0/index.css"
 />
 
 <script type="module">
-    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.0.0/dist/index.js";
+    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.1.0/dist/index.js";
 
     initTargetFunctions();
 </script>
 ```
 
-Pin the version (`@v3.0.0`) on a live site. A pinned URL never changes;
-`@2` follows the newest 2.x release.
+Pin the version (`@v3.1.0`) on a live site. A pinned URL never changes;
+`@3` follows the newest 3.x release.
 
 ## Files
 
@@ -99,6 +99,7 @@ Run left to right, each one seeing the result of the one before.
 | `if-opened-A-close-B`  | If any A is open, close B  |
 | `if-opened-A-toggle-B` | If any A is open, flip B   |
 | `if-closed-A-…-B`      | Same, when no A is open    |
+| `…-except-N`           | Any of the above, leaving out the targets named N |
 
 ```html
 <!-- open the menu, and close search if it happens to be open -->
@@ -107,6 +108,124 @@ Run left to right, each one seeing the result of the one before.
 
 Several elements may share a name — `close-menu` closes the drawer and its
 backdrop together.
+
+### Except
+
+Any command may end in `-except-` and one or more names: the targets
+carrying any of them are left out.
+
+| Command                               | Effect                                         |
+| ------------------------------------- | ---------------------------------------------- |
+| `close-faq-except-s3`                 | Close every `faq` but `s3` — an accordion      |
+| `toggle-faq-except-s3`                | Flip every `faq` but `s3`                      |
+| `open-faq-except-s3-s4`               | Open every `faq` but `s3` and `s4`             |
+| `toggle-panel-except-faq`             | Flip every `panel` that is not also a `faq`    |
+| `if-opened-menu-close-faq-except-s3`  | The same, behind a condition                   |
+
+Without it, every target with the name is reached — the button's own one
+too. The exception is the button's, written where it is clicked: another
+button may leave out something else, or nothing.
+
+## Screen sizes
+
+What a button does may differ by screen size: one question open at a time
+on a computer, any number on a phone. The commands stay in the markup;
+the page's CSS says which of them do **not** run at a given size, in
+`--pg-target-skip` — on the button, or anything above it:
+
+```css
+/* Phones: the questions open freely — "close-faq" does not run. */
+@media (width < 64rem) {
+    .faq {
+        --pg-target-skip: close-faq;
+    }
+}
+```
+
+With Tailwind, on the button or a container: `max-lg:[--pg-target-skip:close-faq]`.
+
+- **Not set** — every command runs, at every size.
+- **An entry matches a command, or its beginning, by whole words**:
+  `close` skips every `close-…`; `close-faq` skips `close-faq` and
+  `close-faq-except-s3`; neither touches `toggle-faq` or `if-closed-…`.
+  For a conditional, name it: `if-opened-menu`.
+- **Several**, space separated: `--pg-target-skip: close-faq open-menu`.
+- **Only on phones** instead: put it in the computer's media query.
+
+It is read at each click, so a resized window takes its new value at the
+next one. A CSS variable, as in the other PlusGuard packages, so the
+package never has to know a theme's breakpoints.
+
+## Accordion
+
+A question and its answer: the button toggles its own answer, and closes
+the others — except its own.
+
+```html
+<div class="faq">
+    <button class="faq-head" data-pg-target-functions="close-faq-except-s1 toggle-s1" aria-controls="s1">
+        What is a target?
+    </button>
+    <div class="faq-body" id="s1" data-pg-target="s1 faq" data-pg-target-active="false">
+        <div>Any element with data-pg-target.</div>
+    </div>
+    <!-- s2, s3 … the same -->
+</div>
+```
+
+**One at a time on a computer, any number on a phone:** add
+`--pg-target-skip: close-faq` to the phone's media query (see [Screen
+sizes](#screen-sizes)). Any number everywhere: leave out the
+`close-faq-except-…`.
+
+**The opening, in CSS — no measuring.** The answer is a one-row grid whose
+row grows from `0fr` to `1fr`; the extra `<div>` inside is what is
+measured, by the browser. Content that changes later — a font loading, a
+window resized — never leaves a stale height behind.
+
+```css
+.faq-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s ease;
+}
+.faq-body > div {
+    overflow: hidden;
+}
+.faq-body[data-pg-target-active="true"] {
+    grid-template-rows: 1fr;
+}
+@media (prefers-reduced-motion: reduce) {
+    .faq-body {
+        transition: none;
+    }
+}
+```
+
+**A footer's columns: open on a computer, an accordion on a phone.** No
+script for that: on a computer the CSS shows every body whatever its
+state, and the heads stop being buttons.
+
+```css
+@media (width >= 64rem) {
+    .footer-body {
+        grid-template-rows: 1fr;
+    }
+    .footer-head {
+        pointer-events: none;
+    }
+}
+```
+
+**Two columns on a computer, one on a phone.** Write each question twice
+— in the left column, all of them; in the right, the even ones — and let
+CSS show the halves on a computer, the whole left one on a phone. The
+copies share their names, so they open and close together: a question
+open on a computer is still open on a phone. A copy that is hidden with
+`display: none` is not read out twice.
+
+Escape and focus moves are kept for dialog-like targets (scroll lock), so
+an accordion behaves like an accordion: Escape does not close it.
 
 ## Scroll lock
 
@@ -141,9 +260,11 @@ Targets with `data-pg-target-scroll-lock="true"` are treated as dialogs:
 - **Focus** moves to the first focusable element inside when it opens, and
   back to the button that opened it when it closes.
 - **Escape** closes the one opened last.
-- **`aria-expanded`** is kept in sync on disclosure buttons — a single
-  `toggle-X` or `open-X`. Close buttons, chains and conditionals are left
-  alone; they have no single expanded state.
+- **`aria-expanded`** is kept in sync on disclosure buttons — those with
+  exactly one plain `toggle-X` or `open-X`, alone or beside close
+  commands and conditionals: an accordion's `close-faq-except-s3
+  toggle-s3` tracks `s3`. Close buttons, and buttons that open two things,
+  are left alone; they have no single expanded state.
 
 Not included: a focus trap. While a drawer is open, Tab can still reach the
 page behind it.
@@ -160,12 +281,17 @@ JSX sets the starting value (`data-pg-target-active="false"`) and must not
 change it afterwards; from then on targetFunctions owns it. If a re-render writes a
 different value, React wins and the state is lost.
 
-See [`examples/react/Example.tsx`](examples/react/Example.tsx). A plain HTML
-version is in [`examples/static/index.html`](examples/static/index.html).
+See [`examples/react/Example.tsx`](examples/react/Example.tsx) — the drawer,
+an accordion and `except` on chips. A plain HTML version is in
+[`examples/static/index.html`](examples/static/index.html): every command, a
+drawer and a search, an accordion (one at a time on a computer, any number
+on a phone), two columns on a computer and one on a phone, a footer open on
+a computer and an accordion on a phone, and `except` on chips.
 
 ## Limits
 
-- Target names must not contain `-` — commands are split on it.
+- Target names must not contain `-` — commands are split on it — and
+  `except` is no name: it is a word of the commands.
 - One listener on `document` handles every trigger, including ones rendered
   later. Call `initTargetFunctions` once. If it is called again before the
   first cleanup runs (React remounting in development), only the newest call

@@ -9,6 +9,14 @@
  *   open-X · close-X · toggle-X
  *   if-opened-A-<open|close|toggle>-B
  *   if-closed-A-<open|close|toggle>-B
+ * Any of them may end in -except-N…: the targets named N are left out.
+ *   close-faq-except-s3   every faq but s3 — an accordion
+ *
+ * Per screen size, a CSS variable on the button (or above it) names the
+ * commands that do not run there — media queries welcome:
+ *   @media (width < 64rem) { .faq { --pg-target-skip: close-faq; } }
+ * An entry matches a command, or its beginning: "close" skips every
+ * close-…, "close-faq" skips close-faq and close-faq-except-s3.
  *
  * State lives in ONE attribute, data-pg-target-active="true|false". The old
  * code kept it twice (data-qua-status plus the qua-active class) and every
@@ -17,7 +25,8 @@
  * Every attribute starts with data-pg-target, so nothing here can collide
  * with another package's names.
  *
- * Names are split on "-", so a target name must not contain one.
+ * Names are split on "-", so a target name must not contain one — and
+ * "except" is a word of the commands, so it is no name either.
  *
  * No dependencies. The scroll lock is CSS: index.css keeps the page still
  * while a data-pg-target-scroll-lock="true" target is open — any number of
@@ -32,6 +41,7 @@ const TRIGGER = "data-pg-target-functions";
 const TARGET = "data-pg-target";
 const ACTIVE = "data-pg-target-active";
 const SCROLL_LOCK = "data-pg-target-scroll-lock";
+const SKIP = "--pg-target-skip";
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 /* A target may carry several names: data-pg-target="aside menu". */
 function namesOf(el) {
@@ -52,19 +62,52 @@ function isAction(value) {
 function commandsOf(trigger) {
     return (trigger.getAttribute(TRIGGER) ?? "").trim().split(/\s+/).filter(Boolean);
 }
+function parse(command) {
+    const all = command.split("-");
+    // Everything after "except" is the names left out.
+    const at = all.indexOf("except");
+    const parts = at === -1 ? all : all.slice(0, at);
+    const except = at === -1 ? [] : all.slice(at + 1).filter(Boolean);
+    if (at !== -1 && except.length === 0)
+        return null;
+    // open-X · close-X · toggle-X
+    if (parts.length === 2 && isAction(parts[0]) && parts[1]) {
+        return { action: parts[0], name: parts[1], except };
+    }
+    // if-opened-A-action-B · if-closed-A-action-B
+    if (parts.length === 5 && parts[0] === "if" && isAction(parts[3]) && parts[2] && parts[4]) {
+        if (parts[1] !== "opened" && parts[1] !== "closed")
+            return null;
+        return { action: parts[3], name: parts[4], when: { opened: parts[1] === "opened", name: parts[2] }, except };
+    }
+    return null;
+}
+/* The commands this button does not run at the screen size it is seen at:
+   its --pg-target-skip, set by the page's CSS. */
+function skippedBy(trigger) {
+    return getComputedStyle(trigger).getPropertyValue(SKIP).trim().split(/\s+/).filter(Boolean);
+}
+/* "close" skips close-faq; "close-faq" skips close-faq-except-s3; neither
+   skips closed-… or toggle-…: an entry matches whole words only. */
+const skips = (entry, command) => command === entry || command.startsWith(`${entry}-`);
 /*
  * aria-expanded tells a screen reader whether the thing a button controls
- * is open. Only set on disclosure buttons — a single toggle-X or open-X.
- * A close button, a chain or a conditional has no single "expanded" state,
- * so those are left untouched.
+ * is open. Set on disclosure buttons: those with exactly one plain
+ * toggle-X or open-X — alone, or beside close commands and conditionals,
+ * as an accordion's "close-faq-except-s3 toggle-s3". X is what the button
+ * controls. A close button, or one that opens two things, has no single
+ * "expanded" state, so those are left untouched.
  */
+function ownTarget(trigger) {
+    const opens = commandsOf(trigger)
+        .map(parse)
+        .filter((c) => !!c && !c.when && c.except.length === 0 && (c.action === "toggle" || c.action === "open"));
+    return opens.length === 1 ? opens[0].name : null;
+}
 function syncAria() {
     document.querySelectorAll(`[${TRIGGER}]`).forEach((trigger) => {
-        const commands = commandsOf(trigger);
-        if (commands.length !== 1)
-            return;
-        const [action, name, extra] = commands[0].split("-");
-        if ((action !== "toggle" && action !== "open") || !name || extra)
+        const name = ownTarget(trigger);
+        if (!name)
             return;
         const open = targetsNamed(name).some(isActive);
         trigger.setAttribute("aria-expanded", String(open));
@@ -125,8 +168,10 @@ export function initTargetFunctions() {
                 back.focus({ preventScroll: true });
         }
     };
-    const apply = (action, name) => {
+    const apply = (action, name, except = []) => {
         for (const el of targetsNamed(name)) {
+            if (except.length && namesOf(el).some((n) => except.includes(n)))
+                continue;
             if (action === "open")
                 setActive(el, true);
             else if (action === "close")
@@ -136,24 +181,17 @@ export function initTargetFunctions() {
         }
     };
     const run = (command) => {
-        const parts = command.split("-");
-        // open-X · close-X · toggle-X
-        if (parts.length === 2 && isAction(parts[0])) {
-            apply(parts[0], parts[1]);
+        const c = parse(command);
+        if (!c)
             return;
-        }
-        // if-opened-A-action-B · if-closed-A-action-B
-        //
         // The condition is checked once. The old code ran the action once
         // per matching A, so two open A's toggled B twice and cancelled out.
-        if (parts.length === 5 && parts[0] === "if" && isAction(parts[3])) {
-            const wanted = parts[1] === "opened" ? true : parts[1] === "closed" ? false : null;
-            if (wanted === null)
+        if (c.when) {
+            const { opened, name } = c.when;
+            if (!targetsNamed(name).some((el) => isActive(el) === opened))
                 return;
-            if (targetsNamed(parts[2]).some((el) => isActive(el) === wanted)) {
-                apply(parts[3], parts[4]);
-            }
         }
+        apply(c.action, c.name, c.except);
     };
     /*
      * One listener on document, resolved at click time. The old code bound
@@ -166,8 +204,13 @@ export function initTargetFunctions() {
         const trigger = event.target?.closest(`[${TRIGGER}]`);
         if (!trigger)
             return;
+        // What this screen size leaves out, read once per click — so a
+        // media query that changes it takes effect on the next one.
+        const skip = skippedBy(trigger);
         currentTrigger = trigger;
-        commandsOf(trigger).forEach(run);
+        commandsOf(trigger)
+            .filter((command) => !skip.some((entry) => skips(entry, command)))
+            .forEach(run);
         currentTrigger = null;
         syncAria();
     };

@@ -7,7 +7,7 @@
         <title>targetFunctions — example</title>
         <link
             rel="stylesheet"
-            href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.0.0/index.css"
+            href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.1.0/index.css"
         />
         <style>
             :root {
@@ -188,6 +188,126 @@
             .small {
                 font-size: 1rem;
                 margin-bottom: 1rem;
+            }
+
+            /* Accordions: the body is a one-row grid that grows from 0fr to
+               1fr — no measuring; the inner div is what the browser sizes. */
+            .acc {
+                display: grid;
+                gap: 0.5rem;
+            }
+            .acc-head {
+                width: 100%;
+                justify-content: space-between;
+                text-align: left;
+            }
+            .acc-head::after {
+                content: "+";
+                color: var(--muted);
+            }
+            .acc-head[aria-expanded="true"]::after {
+                content: "–";
+            }
+            .acc-body {
+                display: grid;
+                grid-template-rows: 0fr;
+                transition: grid-template-rows 0.4s var(--ease);
+            }
+            .acc-body > div {
+                overflow: hidden;
+            }
+            .acc-body p {
+                padding: 0.5rem 1.25rem 1rem;
+                color: var(--muted);
+            }
+            .acc-body[data-pg-target-active="true"] {
+                grid-template-rows: 1fr;
+            }
+            /* Phones: any number open — "close-faq" does not run there. */
+            @media (width < 48rem) {
+                .single {
+                    --pg-target-skip: close-faq;
+                }
+            }
+
+            /* Two columns on a computer, one on a phone: the left column
+               holds every question, the right one the even ones again. */
+            .cols {
+                display: grid;
+                gap: 0.5rem 1rem;
+                align-items: start;
+            }
+            @media (width >= 48rem) {
+                .cols {
+                    grid-template-columns: 1fr 1fr;
+                }
+                .cols .left > .even {
+                    display: none;
+                }
+            }
+            @media (width < 48rem) {
+                .cols .right {
+                    display: none;
+                }
+            }
+
+            /* A footer: its columns open on a computer, an accordion on a
+               phone — no script for the computer, CSS shows every body. */
+            .foot {
+                display: grid;
+                gap: 0.5rem 2rem;
+                padding: 1.5rem;
+                border: 1px solid var(--line);
+                border-radius: 0.75rem;
+                background: var(--surface);
+            }
+            .foot .acc-head {
+                border: 0;
+                padding-inline: 0;
+                background: none;
+                font-weight: 600;
+            }
+            .foot .acc-body p {
+                padding-inline: 0;
+            }
+            @media (width >= 48rem) {
+                .foot {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+                .foot .acc-body {
+                    grid-template-rows: 1fr;
+                }
+                .foot .acc-head {
+                    pointer-events: none;
+                }
+                .foot .acc-head::after {
+                    content: none;
+                }
+            }
+
+            /* Except, beyond accordions: three chips that light when open. */
+            .chips {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+            .chip {
+                padding: 0.4rem 0.9rem;
+                border-radius: 999px;
+                border: 1px solid var(--line);
+                color: var(--muted);
+                transition: 0.2s;
+            }
+            .chip[data-pg-target-active="true"] {
+                background: var(--accent);
+                border-color: var(--accent);
+                color: var(--on-accent);
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .acc-body {
+                    transition: none;
+                }
             }
 
             /* Menu: drawer + backdrop, both named "menu" */
@@ -374,6 +494,145 @@
                 <button class="btn" data-pg-target-functions="close-answers">Close all</button>
             </div>
 
+            <h2>An accordion — one at a time, any number on a phone</h2>
+            <p class="lead small">
+                Each question: <code>close-faq-except-s1 toggle-s1</code> — close every answer but its own, then
+                flip its own. On a phone, <code>--pg-target-skip: close-faq</code> (in a media query) leaves the
+                close out, so any number stay open. The opening is CSS: a grid row from <code>0fr</code> to
+                <code>1fr</code>, nothing measured. Narrow the window to see the phone's way.
+            </p>
+            <div class="acc single">
+                <div>
+                    <button class="btn acc-head" data-pg-target-functions="close-faq-except-s1 toggle-s1" aria-controls="s1">What is a target?</button>
+                    <div class="acc-body" id="s1" data-pg-target="s1 faq" data-pg-target-active="false">
+                        <div><p>Any element with <code>data-pg-target</code>. Commands open, close and toggle it by name.</p></div>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn acc-head" data-pg-target-functions="close-faq-except-s2 toggle-s2" aria-controls="s2">Can two targets share a name?</button>
+                    <div class="acc-body" id="s2" data-pg-target="s2 faq" data-pg-target-active="false">
+                        <div><p>Yes — every one of them is reached. The drawer and its backdrop are both <code>menu</code>; these answers are all <code>faq</code> too.</p></div>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn acc-head" data-pg-target-functions="close-faq-except-s3 toggle-s3" aria-controls="s3">What does except do?</button>
+                    <div class="acc-body" id="s3" data-pg-target="s3 faq" data-pg-target-active="false">
+                        <div><p>It leaves names out of a command: <code>close-faq-except-s3</code> closes every answer but this one.</p></div>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn acc-head" data-pg-target-functions="close-faq-except-s4 toggle-s4" aria-controls="s4">Why open more than one on a phone?</button>
+                    <div class="acc-body" id="s4" data-pg-target="s4 faq" data-pg-target-active="false">
+                        <div><p>On a narrow screen a closing answer moves the one you tapped. Here <code>--pg-target-skip: close-faq</code> keeps them all where they are.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Two columns on a computer, one on a phone</h2>
+            <p class="lead small">
+                The left column holds every question; the right one, the even ones again. CSS shows the halves on
+                a computer and the whole left column on a phone. The copies share their names, so they open and
+                close together — open one, narrow the window: it is still open. One at a time, in their own
+                group: <code>close-cols-except-c1 toggle-c1</code>.
+            </p>
+            <div class="cols">
+                <div class="acc left">
+                <div class="odd">
+                    <button class="btn acc-head" data-pg-target-functions="close-cols-except-c1 toggle-c1" aria-controls="c1">Is it one script?</button>
+                    <div class="acc-body" id="c1" data-pg-target="c1 cols" data-pg-target-active="false">
+                        <div><p>One file, no dependencies, with a small stylesheet for the scroll lock.</p></div>
+                    </div>
+                </div>
+                <div class="even">
+                    <button class="btn acc-head" data-pg-target-functions="close-cols-except-c2 toggle-c2" aria-controls="c2">Does it work with React?</button>
+                    <div class="acc-body" id="c2" data-pg-target="c2 cols" data-pg-target-active="false">
+                        <div><p>Yes — call it once in an effect; it returns its own cleanup.</p></div>
+                    </div>
+                </div>
+                <div class="odd">
+                    <button class="btn acc-head" data-pg-target-functions="close-cols-except-c3 toggle-c3" aria-controls="c3">Where does the state live?</button>
+                    <div class="acc-body" id="c3" data-pg-target="c3 cols" data-pg-target-active="false">
+                        <div><p>In <code>data-pg-target-active</code>, on the target itself.</p></div>
+                    </div>
+                </div>
+                <div class="even">
+                    <button class="btn acc-head" data-pg-target-functions="close-cols-except-c4 toggle-c4" aria-controls="c4">Can a command wait for a condition?</button>
+                    <div class="acc-body" id="c4" data-pg-target="c4 cols" data-pg-target-active="false">
+                        <div><p><code>if-opened-A-close-B</code> runs only while an A is open.</p></div>
+                    </div>
+                </div>
+                </div>
+                <!-- The even ones again — hidden on a phone, so not read out twice. -->
+                <div class="acc right">
+                <div>
+                    <button class="btn acc-head" data-pg-target-functions="close-cols-except-c2 toggle-c2">Does it work with React?</button>
+                    <div class="acc-body" data-pg-target="c2 cols" data-pg-target-active="false">
+                        <div><p>Yes — call it once in an effect; it returns its own cleanup.</p></div>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn acc-head" data-pg-target-functions="close-cols-except-c4 toggle-c4">Can a command wait for a condition?</button>
+                    <div class="acc-body" data-pg-target="c4 cols" data-pg-target-active="false">
+                        <div><p><code>if-opened-A-close-B</code> runs only while an A is open.</p></div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <h2>A footer — open on a computer, an accordion on a phone</h2>
+            <p class="lead small">
+                On a computer every column is open and its head is no button: CSS shows the bodies whatever their
+                state. On a phone they are an accordion, one at a time: <code>close-foot-except-f1 toggle-f1</code>.
+            </p>
+            <div class="foot">
+                <div>
+                    <button class="btn acc-head" data-pg-target-functions="close-foot-except-f1 toggle-f1" aria-controls="f1">Products</button>
+                    <div class="acc-body" id="f1" data-pg-target="f1 foot" data-pg-target-active="false">
+                        <div><p>All products · New in</p></div>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn acc-head" data-pg-target-functions="close-foot-except-f2 toggle-f2" aria-controls="f2">Company</button>
+                    <div class="acc-body" id="f2" data-pg-target="f2 foot" data-pg-target-active="false">
+                        <div><p>About us · Contact</p></div>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn acc-head" data-pg-target-functions="close-foot-except-f3 toggle-f3" aria-controls="f3">Help</button>
+                    <div class="acc-body" id="f3" data-pg-target="f3 foot" data-pg-target-active="false">
+                        <div><p>Guides · Warranty</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Except — not only for accordions</h2>
+            <p class="lead small">
+                Three chips, each its own name and all of them <code>chip</code>. Any command may leave some out.
+            </p>
+            <div class="chips">
+                <span class="chip" data-pg-target="a chip" data-pg-target-active="false">A</span>
+                <span class="chip" data-pg-target="b chip" data-pg-target-active="false">B</span>
+                <span class="chip" data-pg-target="c chip" data-pg-target-active="false">C</span>
+            </div>
+            <ul class="demo">
+                <li>
+                    <div><code>toggle-chip</code><p>Flip all three.</p></div>
+                    <button class="btn" data-pg-target-functions="toggle-chip">Run</button>
+                </li>
+                <li>
+                    <div><code>toggle-chip-except-a</code><p>Flip B and C; A is left as it is.</p></div>
+                    <button class="btn" data-pg-target-functions="toggle-chip-except-a">Run</button>
+                </li>
+                <li>
+                    <div><code>open-chip-except-b-c</code><p>Open A only.</p></div>
+                    <button class="btn" data-pg-target-functions="open-chip-except-b-c">Run</button>
+                </li>
+                <li>
+                    <div><code>close-chip</code><p>Close them all.</p></div>
+                    <button class="btn" data-pg-target-functions="close-chip">Run</button>
+                </li>
+            </ul>
+
             <h2>Things to notice</h2>
             <ul class="tips">
                 <li><kbd>Esc</kbd> closes whatever was opened last.</li>
@@ -423,7 +682,7 @@
         </div>
 
         <script type="module">
-            import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.0.0/dist/index.js";
+            import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.1.0/dist/index.js";
 
             // No locker to wire up: index.css keeps the page still while a
             // data-pg-target-scroll-lock target is open.
