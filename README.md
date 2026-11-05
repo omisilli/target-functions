@@ -10,7 +10,7 @@ state. One file, no dependencies, framework-agnostic.
 ```
 
 ```sh
-npm install github:omisilli/target-functions#v2.0.0
+npm install github:omisilli/target-functions#v3.0.0
 ```
 
 ```ts
@@ -28,17 +28,17 @@ by double-clicking:
 ```html
 <link
     rel="stylesheet"
-    href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v2.0.0/index.css"
+    href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.0.0/index.css"
 />
 
 <script type="module">
-    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v2.0.0/dist/index.js";
+    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.0.0/dist/index.js";
 
     initTargetFunctions();
 </script>
 ```
 
-Pin the version (`@v2.0.0`) on a live site. A pinned URL never changes;
+Pin the version (`@v3.0.0`) on a live site. A pinned URL never changes;
 `@2` follows the newest 2.x release.
 
 ## Files
@@ -46,7 +46,7 @@ Pin the version (`@v2.0.0`) on a live site. A pinned URL never changes;
 | File              | For                                                              |
 | ----------------- | ---------------------------------------------------------------- |
 | `index.ts`        | TypeScript source — import it directly in a TS / bundler project |
-| `index.css`       | The CSS half — empty for now, see below                          |
+| `index.css`       | The CSS half: the scroll lock                                    |
 | `dist/index.js`   | Compiled ES module — plain HTML, no build step                   |
 | `dist/index.d.ts` | Types for `dist/index.js`                                        |
 
@@ -83,9 +83,8 @@ with another library's names.
 
 ## CSS
 
-`index.css` is empty: how an open target looks is your page's business.
-Import it anyway. If the package ever needs CSS of its own, your page
-already loads it and nothing changes on your side.
+`index.css` holds one rule: the scroll lock (see below). How an open target
+looks is your page's business — style it on `data-pg-target-active`.
 
 ## Commands
 
@@ -111,19 +110,29 @@ backdrop together.
 
 ## Scroll lock
 
-targetFunctions does not lock the page itself. Pass the two callbacks you
-want called when a `data-pg-target-scroll-lock="true"` target opens and closes:
+While a `data-pg-target-scroll-lock="true"` target is open, the page stays
+still. That is all CSS, in `index.css` — no callback, no locker to wire up:
 
-```ts
-initTargetFunctions({
-    lock: (source) => (document.documentElement.style.overflow = "clip"),
-    unlock: (source) => (document.documentElement.style.overflow = ""),
-});
+```css
+html:has([data-pg-target-scroll-lock="true"][data-pg-target-active="true"]) {
+    overflow: clip;
+}
 ```
 
-`source` is unique per target (`targetFunctions:menu`), so a locker that
-counts holders can keep the page locked until every one of them has closed.
-Without callbacks, those targets simply open without locking.
+- **Any number of them.** Open a drawer, then a search over it, close the
+  drawer: the page stays locked until the last one has closed. The selector
+  does the counting.
+- **`clip`, not `hidden`:** a script cannot scroll the page either.
+- **Lenis** catches the wheel itself, so an overflow rule alone does not stop
+  it. Give it `autoToggle: true` (with its `lenis.css`): Lenis stops by itself
+  while `<html>` cannot scroll, and starts again after.
+
+```ts
+new Lenis({ autoRaf: true, autoToggle: true });
+```
+
+Anything else that should notice the lock can read the same thing — the
+page's overflow — without knowing about targetFunctions.
 
 ## Accessibility
 
@@ -161,6 +170,13 @@ version is in [`examples/static/index.html`](examples/static/index.html).
   later. Call `initTargetFunctions` once. If it is called again before the
   first cleanup runs (React remounting in development), only the newest call
   answers clicks, and the older cleanup does not switch it off.
+
+## Upgrading from 2.x
+
+The scroll lock moved into `index.css`, so `initTargetFunctions` takes no
+options any more: drop `{ lock, unlock }` and whatever locker you passed in
+(the old scrollLocker), import `index.css`, and with Lenis set
+`autoToggle: true`.
 
 ## Upgrading from 1.x
 

@@ -7,7 +7,7 @@
         <title>targetFunctions — example</title>
         <link
             rel="stylesheet"
-            href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v2.0.0/index.css"
+            href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.0.0/index.css"
         />
         <style>
             :root {
@@ -423,24 +423,11 @@
         </div>
 
         <script type="module">
-            import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v2.0.0/dist/index.js";
+            import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.0.0/dist/index.js";
 
-            // A minimal locker: the page stays still until every open target has closed.
-            const holders = new Set();
-            const sync = () => {
-                document.documentElement.style.overflow = holders.size ? "clip" : "";
-            };
-
-            initTargetFunctions({
-                lock: (source) => {
-                    holders.add(source);
-                    sync();
-                },
-                unlock: (source) => {
-                    holders.delete(source);
-                    sync();
-                },
-            });
+            // No locker to wire up: index.css keeps the page still while a
+            // data-pg-target-scroll-lock target is open.
+            initTargetFunctions();
         </script>
     </body>
 </html>

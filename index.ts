@@ -19,21 +19,15 @@
  *
  * Names are split on "-", so a target name must not contain one.
  *
- * No dependencies. Scroll locking is optional and supplied by the caller:
- *   initTargetFunctions({ lock, unlock })
- * Without it, data-pg-target-scroll-lock targets simply open without locking.
+ * No dependencies. The scroll lock is CSS: index.css keeps the page still
+ * while a data-pg-target-scroll-lock="true" target is open — any number of
+ * them, the page frees itself when the last one closes. With Lenis, its
+ * autoToggle option stops Lenis by itself while the page is locked.
  *
  * React: JSX sets the starting value (data-pg-target-active="false") and
  * must not change it afterwards — from then on this file owns it. If a
  * re-render writes a different value, React wins and the state is lost.
  */
-
-export type TargetFunctionsOptions = {
-    /** Called when a data-pg-target-scroll-lock target opens. `source` is unique per target. */
-    lock?: (source: string) => void;
-    /** Called when that target closes, with the same `source`. */
-    unlock?: (source: string) => void;
-};
 
 type Action = "open" | "close" | "toggle";
 
@@ -100,12 +94,11 @@ function syncAria(): void {
 let live: object | null = null;
 
 /* Start listening; returns the cleanup for a React effect. */
-export function initTargetFunctions(options: TargetFunctionsOptions = {}): () => void {
+export function initTargetFunctions(): () => void {
     if (typeof document === "undefined") return () => {};
 
     const self = {};
     live = self;
-    const { lock, unlock } = options;
 
     /*
      * Accessibility state, kept per call.
@@ -122,13 +115,10 @@ export function initTargetFunctions(options: TargetFunctionsOptions = {}): () =>
     let currentTrigger: HTMLElement | null = null;
 
     /*
-     * Replaces the old scrollBridge.js. That file watched data-qua-status
-     * with a MutationObserver because the scripts were separate globals;
-     * here we are the ones changing the state, so we call the lock
-     * callbacks directly.
-     *
-     * Each target locks under its own name. The old bridge used one shared
-     * name, so closing one of two open panels unlocked the page early.
+     * The lock itself is index.css, reading the state written here — no
+     * scrollLocker, no bridge. The old bridge used one shared name, so
+     * closing one of two open panels unlocked the page early; the CSS rule
+     * holds while any of them is open.
      */
     const setActive = (el: HTMLElement, active: boolean): void => {
         const was = isActive(el);
@@ -136,15 +126,11 @@ export function initTargetFunctions(options: TargetFunctionsOptions = {}): () =>
 
         if (!locksScroll(el) || was === active) return;
 
-        const source = `targetFunctions:${el.getAttribute(TARGET)}`;
-
         if (active) {
-            lock?.(source);
             openStack.push(el);
             if (currentTrigger) openedBy.set(el, currentTrigger);
             el.querySelector<HTMLElement>(FOCUSABLE)?.focus({ preventScroll: true });
         } else {
-            unlock?.(source);
             const index = openStack.indexOf(el);
             if (index !== -1) openStack.splice(index, 1);
 

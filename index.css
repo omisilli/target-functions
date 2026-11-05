@@ -1,8 +1,17 @@
 /*
- * targetFunctions — the CSS half. Empty on purpose.
+ * targetFunctions — the CSS half: the scroll lock.
  *
  * targetFunctions only writes data-pg-target-active; how an open target
- * looks is the page's business. The file exists so that a theme imports it
- * from day one: if the package ever needs CSS of its own, every theme
- * already loads it and nothing has to change on their side.
+ * looks is the page's business. What it does do here: while a target
+ * marked data-pg-target-scroll-lock="true" is open, the page stays still.
+ *
+ * On <html>, clip rather than hidden: hidden still lets a script scroll the
+ * page, clip does not. Any number of locking targets: the page is free again
+ * once the last one has closed — no counting needed, the selector is it.
+ *
+ * With Lenis: give it autoToggle: true (and its lenis.css) — Lenis stops by
+ * itself while <html> cannot scroll, and starts again after.
  */
+html:has([data-pg-target-scroll-lock="true"][data-pg-target-active="true"]) {
+    overflow: clip;
+}
