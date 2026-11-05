@@ -282,11 +282,12 @@ change it afterwards; from then on targetFunctions owns it. If a re-render write
 different value, React wins and the state is lost.
 
 See [`examples/react/Example.tsx`](examples/react/Example.tsx) — the drawer,
-an accordion and `except` on chips. A plain HTML version is in
+an accordion, `except` on chips, and a site's footer. A plain HTML version is in
 [`examples/static/index.html`](examples/static/index.html): every command, a
 drawer and a search, an accordion (one at a time on a computer, any number
 on a phone), two columns on a computer and one on a phone, a footer open on
-a computer and an accordion on a phone, and `except` on chips.
+a computer and an accordion on a phone — the page's own, at its bottom:
+five columns, an arrow turning as one opens — and `except` on chips.
 
 ## Limits
 

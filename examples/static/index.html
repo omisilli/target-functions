@@ -258,38 +258,115 @@
                 }
             }
 
-            /* A footer: its columns open on a computer, an accordion on a
-               phone — no script for the computer, CSS shows every body. */
-            .foot {
+            /* The page's footer — open columns on a computer, an accordion
+               below 62rem (992px). As the old one: one at a time, but any
+               number on the narrowest phones (350px and less). */
+            .site-foot {
+                background: #252525;
+                color: #fff;
+                padding: 45px 28px;
+            }
+            .sf-cols {
+                max-width: 1863px;
+                margin: 0 auto;
                 display: grid;
-                gap: 0.5rem 2rem;
-                padding: 1.5rem;
-                border: 1px solid var(--line);
-                border-radius: 0.75rem;
-                background: var(--surface);
+                grid-template-columns: repeat(5, auto);
+                justify-content: space-between;
+                gap: 0 20px;
             }
-            .foot .acc-head,
-            .foot .acc-head[aria-expanded="true"] {
+            .sf-head {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0;
                 border: 0;
-                padding-inline: 0;
                 background: none;
-                font-weight: 600;
+                color: inherit;
+                font-weight: 500;
+                font-size: 16px;
+                text-align: left;
             }
-            .foot .acc-body p {
-                padding-inline: 0;
+            .sf-head svg {
+                display: none;
+                width: 16px;
+                height: 16px;
+                transition: rotate 0.5s ease;
             }
-            @media (width >= 48rem) {
-                .foot {
-                    grid-template-columns: repeat(3, 1fr);
-                }
-                .foot .acc-body {
-                    grid-template-rows: 1fr;
-                }
-                .foot .acc-head {
+            .sf-head[aria-expanded="true"] svg {
+                rotate: 90deg;
+            }
+            .sf-body {
+                display: grid;
+                grid-template-rows: 1fr;
+                margin-top: 15px;
+            }
+            .sf-body > div {
+                overflow: hidden;
+            }
+            .sf-body ul {
+                list-style: none;
+                padding: 0;
+            }
+            .sf-body li {
+                margin: 13px 0;
+            }
+            .sf-body a {
+                font-size: 14px;
+                color: rgb(255 255 255 / 0.7);
+                text-decoration: none;
+            }
+            .sf-body a:hover {
+                text-decoration: underline;
+            }
+            /* A computer: titles, not buttons — every column open. */
+            @media (width >= 62rem) {
+                .sf-head {
                     pointer-events: none;
                 }
-                .foot .acc-head::after {
-                    content: none;
+            }
+            /* Below 62rem: an accordion, opening and closing over 0.5s. */
+            @media (width < 62rem) {
+                .site-foot {
+                    padding: 15px;
+                }
+                .sf-cols {
+                    display: flex;
+                    flex-direction: column;
+                }
+                .sf-head {
+                    padding: 20px 0 16px;
+                }
+                .sf-head svg {
+                    display: block;
+                }
+                .sf-body {
+                    grid-template-rows: 0fr;
+                    margin-top: 0;
+                    transition: grid-template-rows 0.5s ease;
+                }
+                .sf-body[data-pg-target-active="true"] {
+                    grid-template-rows: 1fr;
+                }
+                .sf-body li {
+                    text-align: center;
+                }
+            }
+            @media (width < 36rem) {
+                .sf-body li {
+                    text-align: left;
+                }
+            }
+            /* The narrowest phones: any number open — close-foot is left out. */
+            @media (width <= 350px) {
+                .site-foot {
+                    --pg-target-skip: close-foot;
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .sf-body,
+                .sf-head svg {
+                    transition: none;
                 }
             }
 
@@ -589,29 +666,12 @@
 
             <h2>A footer — open on a computer, an accordion on a phone</h2>
             <p class="lead small">
-                On a computer every column is open and its head is no button: CSS shows the bodies whatever their
-                state. On a phone they are an accordion, one at a time: <code>close-foot-except-f1 toggle-f1</code>.
+                At the bottom of this page. On a computer, five open columns, and their titles are no buttons: CSS
+                shows every list whatever its state. Below 62rem they stack into an accordion, one at a time —
+                <code>close-foot-except-f1 toggle-f1</code> — opening over half a second, the arrow turning with
+                it; on the narrowest phones, any number (<code>--pg-target-skip: close-foot</code>). Narrow the
+                window and scroll down.
             </p>
-            <div class="foot">
-                <div>
-                    <button class="btn acc-head" data-pg-target-functions="close-foot-except-f1 toggle-f1" aria-controls="f1">Products</button>
-                    <div class="acc-body" id="f1" data-pg-target="f1 foot" data-pg-target-active="false">
-                        <div><p>All products · New in</p></div>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn acc-head" data-pg-target-functions="close-foot-except-f2 toggle-f2" aria-controls="f2">Company</button>
-                    <div class="acc-body" id="f2" data-pg-target="f2 foot" data-pg-target-active="false">
-                        <div><p>About us · Contact</p></div>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn acc-head" data-pg-target-functions="close-foot-except-f3 toggle-f3" aria-controls="f3">Help</button>
-                    <div class="acc-body" id="f3" data-pg-target="f3 foot" data-pg-target-active="false">
-                        <div><p>Guides · Warranty</p></div>
-                    </div>
-                </div>
-            </div>
 
             <h2>Except — not only for accordions</h2>
             <p class="lead small">
@@ -654,6 +714,106 @@
 
             <div class="filler">Scroll space — try scrolling with the menu open.</div>
         </main>
+
+        <!-- The page's footer: five columns on a computer, an accordion below
+             62rem. Each title: close every column but its own, then flip its
+             own. -->
+        <footer class="site-foot">
+            <div class="sf-cols">
+                <div>
+                    <h3>
+                        <button class="sf-head" data-pg-target-functions="close-foot-except-f1 toggle-f1" aria-controls="f1">
+                            Corporate
+                            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        </button>
+                    </h3>
+                    <div class="sf-body" id="f1" data-pg-target="f1 foot" data-pg-target-active="false">
+                        <div>
+                            <ul>
+                                <li><a href="#">About us</a></li>
+                                <li><a href="#">Mission</a></li>
+                                <li><a href="#">Vision</a></li>
+                                <li><a href="#">Contact</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>
+                        <button class="sf-head" data-pg-target-functions="close-foot-except-f2 toggle-f2" aria-controls="f2">
+                            Products
+                            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        </button>
+                    </h3>
+                    <div class="sf-body" id="f2" data-pg-target="f2 foot" data-pg-target-active="false">
+                        <div>
+                            <ul>
+                                <li><a href="#">All products</a></li>
+                                <li><a href="#">White goods</a></li>
+                                <li><a href="#">Built-in</a></li>
+                                <li><a href="#">Kitchenware</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>
+                        <button class="sf-head" data-pg-target-functions="close-foot-except-f3 toggle-f3" aria-controls="f3">
+                            Orders
+                            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        </button>
+                    </h3>
+                    <div class="sf-body" id="f3" data-pg-target="f3 foot" data-pg-target-active="false">
+                        <div>
+                            <ul>
+                                <li><a href="#">Delivery terms</a></li>
+                                <li><a href="#">Sales agreement</a></li>
+                                <li><a href="#">Prepayment</a></li>
+                                <li><a href="#">Payment options</a></li>
+                                <li><a href="#">Packing and shipping</a></li>
+                                <li><a href="#">Returns</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>
+                        <button class="sf-head" data-pg-target-functions="close-foot-except-f4 toggle-f4" aria-controls="f4">
+                            FAQ
+                            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        </button>
+                    </h3>
+                    <div class="sf-body" id="f4" data-pg-target="f4 foot" data-pg-target-active="false">
+                        <div>
+                            <ul>
+                                <li><a href="#">General</a></li>
+                                <li><a href="#">Orders</a></li>
+                                <li><a href="#">Shipping</a></li>
+                                <li><a href="#">Payment</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>
+                        <button class="sf-head" data-pg-target-functions="close-foot-except-f5 toggle-f5" aria-controls="f5">
+                            Contact
+                            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        </button>
+                    </h3>
+                    <div class="sf-body" id="f5" data-pg-target="f5 foot" data-pg-target-active="false">
+                        <div>
+                            <ul>
+                                <li><a href="#">Head office</a></li>
+                                <li><a href="#">Factory</a></li>
+                                <li><a href="#">Purchasing</a></li>
+                                <li><a href="#">Human resources</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
 
         <div
             class="backdrop"

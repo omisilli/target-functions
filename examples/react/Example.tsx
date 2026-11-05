@@ -95,3 +95,63 @@ export function Chips() {
         </>
     );
 }
+
+/*
+ * A site's footer: five open columns on a computer, an accordion below
+ * 62rem — one at a time, any number on the narrowest phones. The CSS:
+ *
+ *   .sf-body { display: grid; grid-template-rows: 1fr; }
+ *   .sf-body > div { overflow: hidden; }
+ *   .sf-head svg { display: none; transition: rotate 0.5s ease; }
+ *   .sf-head[aria-expanded="true"] svg { rotate: 90deg; }
+ *   @media (width >= 62rem) { .sf-head { pointer-events: none; } }   titles, not buttons
+ *   @media (width < 62rem) {
+ *       .sf-head svg { display: block; }
+ *       .sf-body { grid-template-rows: 0fr; transition: grid-template-rows 0.5s ease; }
+ *       .sf-body[data-pg-target-active="true"] { grid-template-rows: 1fr; }
+ *   }
+ *   @media (width <= 350px) { .site-foot { --pg-target-skip: close-foot; } }
+ */
+const columns = [
+    { id: "f1", title: "Corporate", links: ["About us", "Mission", "Vision", "Contact"] },
+    { id: "f2", title: "Products", links: ["All products", "White goods", "Built-in", "Kitchenware"] },
+    { id: "f3", title: "Orders", links: ["Delivery terms", "Sales agreement", "Payment options", "Returns"] },
+    { id: "f4", title: "FAQ", links: ["General", "Orders", "Shipping", "Payment"] },
+    { id: "f5", title: "Contact", links: ["Head office", "Factory", "Purchasing", "Human resources"] },
+];
+
+export function SiteFooter() {
+    return (
+        <footer className="site-foot">
+            <div className="sf-cols">
+                {columns.map(({ id, title, links }) => (
+                    <div key={id}>
+                        <h3>
+                            <button
+                                className="sf-head"
+                                data-pg-target-functions={`close-foot-except-${id} toggle-${id}`}
+                                aria-controls={id}
+                            >
+                                {title}
+                                <svg viewBox="0 0 16 16" aria-hidden="true">
+                                    <path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                                </svg>
+                            </button>
+                        </h3>
+                        <div className="sf-body" id={id} data-pg-target={`${id} foot`} data-pg-target-active="false">
+                            <div>
+                                <ul>
+                                    {links.map((l) => (
+                                        <li key={l}>
+                                            <a href="#">{l}</a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </footer>
+    );
+}
