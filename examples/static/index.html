@@ -82,7 +82,10 @@
             .btn:hover {
                 border-color: var(--muted);
             }
-            .btn[aria-expanded="true"] {
+            /* The top bar's buttons fill while their drawer is open. Only
+               theirs: "Open all" opens several things, and is "expanded"
+               whenever any of them is open — no look of its own for that. */
+            .bar .btn[aria-expanded="true"] {
                 background: var(--accent);
                 border-color: var(--accent);
                 color: var(--on-accent);
@@ -259,8 +262,7 @@
             }
 
             /* The page's footer — open columns on a computer, an accordion
-               below 62rem (992px). As the old one: one at a time, but any
-               number on the narrowest phones (350px and less). */
+               below 62rem (992px), one at a time at every width. */
             .site-foot {
                 background: #252525;
                 color: #fff;
@@ -355,12 +357,6 @@
             @media (width < 36rem) {
                 .sf-body li {
                     text-align: left;
-                }
-            }
-            /* The narrowest phones: any number open — close-foot is left out. */
-            @media (width <= 350px) {
-                .site-foot {
-                    --pg-target-skip: close-foot;
                 }
             }
             @media (prefers-reduced-motion: reduce) {
@@ -669,8 +665,7 @@
                 At the bottom of this page. On a computer, five open columns, and their titles are no buttons: CSS
                 shows every list whatever its state. Below 62rem they stack into an accordion, one at a time —
                 <code>close-foot-except-f1 toggle-f1</code> — opening over half a second, the arrow turning with
-                it; on the narrowest phones, any number (<code>--pg-target-skip: close-foot</code>). Narrow the
-                window and scroll down.
+                it. Narrow the window and scroll down.
             </p>
 
             <h2>Except — not only for accordions</h2>

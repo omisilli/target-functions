@@ -98,7 +98,7 @@ export function Chips() {
 
 /*
  * A site's footer: five open columns on a computer, an accordion below
- * 62rem — one at a time, any number on the narrowest phones. The CSS:
+ * 62rem — one at a time. The CSS:
  *
  *   .sf-body { display: grid; grid-template-rows: 1fr; }
  *   .sf-body > div { overflow: hidden; }
@@ -110,7 +110,6 @@ export function Chips() {
  *       .sf-body { grid-template-rows: 0fr; transition: grid-template-rows 0.5s ease; }
  *       .sf-body[data-pg-target-active="true"] { grid-template-rows: 1fr; }
  *   }
- *   @media (width <= 350px) { .site-foot { --pg-target-skip: close-foot; } }
  */
 const columns = [
     { id: "f1", title: "Corporate", links: ["About us", "Mission", "Vision", "Contact"] },
