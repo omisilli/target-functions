@@ -205,6 +205,13 @@
                 content: "+";
                 color: var(--muted);
             }
+            /* Open: the same surface and text — only the edge shows it. Not
+               the filled look of the menu's buttons. */
+            .acc-head[aria-expanded="true"] {
+                background: var(--surface);
+                color: inherit;
+                border-color: var(--accent);
+            }
             .acc-head[aria-expanded="true"]::after {
                 content: "–";
             }
@@ -261,7 +268,8 @@
                 border-radius: 0.75rem;
                 background: var(--surface);
             }
-            .foot .acc-head {
+            .foot .acc-head,
+            .foot .acc-head[aria-expanded="true"] {
                 border: 0;
                 padding-inline: 0;
                 background: none;
