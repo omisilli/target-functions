@@ -264,7 +264,10 @@ Targets with `data-pg-target-scroll-lock="true"` are treated as dialogs:
   exactly one plain `toggle-X` or `open-X`, alone or beside close
   commands and conditionals: an accordion's `close-faq-except-s3
   toggle-s3` tracks `s3`. Close buttons, and buttons that open two things,
-  are left alone; they have no single expanded state.
+  are left alone; they have no single expanded state. A name that reaches
+  several targets counts as one: an "Open all" button, `open-answers`, is
+  expanded while any answer is open — so give it no "pressed" look of its
+  own.
 
 Not included: a focus trap. While a drawer is open, Tab can still reach the
 page behind it.
@@ -287,7 +290,8 @@ an accordion, `except` on chips, and a site's footer. A plain HTML version is in
 drawer and a search, an accordion (one at a time on a computer, any number
 on a phone), two columns on a computer and one on a phone, a footer open on
 a computer and an accordion on a phone — the page's own, at its bottom:
-five columns, an arrow turning as one opens — and `except` on chips.
+five columns, one open at a time, an arrow turning as one opens — and
+`except` on chips.
 
 ## Limits
 
