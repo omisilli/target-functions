@@ -513,25 +513,25 @@
                 <div>
                     <button class="btn acc-head" data-pg-target-functions="close-faq-except-s1 toggle-s1" aria-controls="s1">What is a target?</button>
                     <div class="acc-body" id="s1" data-pg-target="s1 faq" data-pg-target-active="false">
-                        <div><p>Any element with <code>data-pg-target</code>. Commands open, close and toggle it by name.</p></div>
+                        <div><p>Any element with <code>data-pg-target</code>. Commands open, close and toggle it by name; its state is written in <code>data-pg-target-active</code>, and your CSS decides what open and closed look like — a drawer sliding in, a search dropping from the top, or an answer like this one, growing from nothing to its full height.</p></div>
                     </div>
                 </div>
                 <div>
                     <button class="btn acc-head" data-pg-target-functions="close-faq-except-s2 toggle-s2" aria-controls="s2">Can two targets share a name?</button>
                     <div class="acc-body" id="s2" data-pg-target="s2 faq" data-pg-target-active="false">
-                        <div><p>Yes — every one of them is reached. The drawer and its backdrop are both <code>menu</code>; these answers are all <code>faq</code> too.</p></div>
+                        <div><p>Yes — every one of them is reached. The drawer and its backdrop are both <code>menu</code>, so one command opens both; these answers are all <code>faq</code> too, besides their own names, so one command can close them all. A target may carry as many names as it needs, space separated.</p></div>
                     </div>
                 </div>
                 <div>
                     <button class="btn acc-head" data-pg-target-functions="close-faq-except-s3 toggle-s3" aria-controls="s3">What does except do?</button>
                     <div class="acc-body" id="s3" data-pg-target="s3 faq" data-pg-target-active="false">
-                        <div><p>It leaves names out of a command: <code>close-faq-except-s3</code> closes every answer but this one.</p></div>
+                        <div><p>It leaves names out of a command: <code>close-faq-except-s3</code> closes every answer but this one, and the <code>toggle-s3</code> after it opens or closes this one. Any command may end in it — open, close, toggle, or a conditional — with one name or several.</p></div>
                     </div>
                 </div>
                 <div>
                     <button class="btn acc-head" data-pg-target-functions="close-faq-except-s4 toggle-s4" aria-controls="s4">Why open more than one on a phone?</button>
                     <div class="acc-body" id="s4" data-pg-target="s4 faq" data-pg-target-active="false">
-                        <div><p>On a narrow screen a closing answer moves the one you tapped. Here <code>--pg-target-skip: close-faq</code> keeps them all where they are.</p></div>
+                        <div><p>On a narrow screen a closing answer above moves the one you tapped. Here <code>--pg-target-skip: close-faq</code>, in a media query, leaves the close out on a phone, so the answers stay as they are and any number can be open — while on a computer it is still one at a time.</p></div>
                     </div>
                 </div>
             </div>
