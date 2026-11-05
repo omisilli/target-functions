@@ -187,7 +187,7 @@ window resized — never leaves a stale height behind.
 .faq-body {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 0.4s ease;
+    transition: grid-template-rows 0.5s ease;
 }
 .faq-body > div {
     overflow: hidden;

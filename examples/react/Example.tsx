@@ -48,7 +48,7 @@ export function Example() {
  * The opening is CSS, nothing measured: the body is a one-row grid that
  * grows from 0fr to 1fr; the inner div is what the browser sizes.
  *
- *   .faq-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.4s; }
+ *   .faq-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.5s ease; }
  *   .faq-body > div { overflow: hidden; }
  *   .faq-body[data-pg-target-active="true"] { grid-template-rows: 1fr; }
  */
