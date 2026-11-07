@@ -484,6 +484,28 @@
                 margin-top: 1rem;
             }
 
+            /* A switch, run by targetFunctions itself: its box is a target,
+               the buttons open and close it, and the page reads its state. */
+            .switch {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+                font-size: 0.9rem;
+                color: var(--muted);
+            }
+            .switch[data-pg-target-active="true"] .on,
+            .switch[data-pg-target-active="false"] .off {
+                background: var(--fg);
+                border-color: var(--fg);
+                color: var(--bg);
+            }
+            /* Switched off: the question pressed rides up with the page. */
+            body:has(.switch[data-pg-target="staymode"][data-pg-target-active="false"]) .acc.single {
+                --pg-anchor-stay: none;
+            }
+
             /* Search: drops from the top */
             .search {
                 position: fixed;
@@ -634,6 +656,11 @@
                 the answer above is long. <code>data-pg-anchor-stay</code> on the accordion (the anchor package)
                 keeps the question you pressed where it is while the page above it changes.
             </p>
+            <div class="switch" data-pg-target="staymode" data-pg-target-active="true">
+                The question pressed
+                <button class="btn on" data-pg-target-functions="open-staymode">stays</button>
+                <button class="btn off" data-pg-target-functions="close-staymode">rides up</button>
+            </div>
             <div class="acc single" data-pg-anchor-stay>
                 <div>
                     <button class="btn acc-head" data-pg-target-functions="close-faq-except-s1 toggle-s1" aria-controls="s1">What is a target?</button>
