@@ -25,6 +25,13 @@
  * Every attribute starts with data-pg-target, so nothing here can collide
  * with another package's names.
  *
+ * An address ending in #id opens what that id is, or is inside: a closed
+ * target opens the way its own button opens it — a tab's
+ * "close-tab-except-t2 open-t2" closes the other tabs too — and the page
+ * then goes to #id, as the browser would have had it been open. On load,
+ * and whenever the hash changes. With no hash, the markup's own state
+ * stands: write the first tab open.
+ *
  * Names are split on "-", so a target name must not contain one — and
  * "except" is a word of the commands, so it is no name either.
  *
@@ -198,13 +205,8 @@ export function initTargetFunctions() {
      * each trigger once at page load, which misses anything React renders
      * later.
      */
-    const onClick = (event) => {
-        if (live !== self)
-            return;
-        const trigger = event.target?.closest(`[${TRIGGER}]`);
-        if (!trigger)
-            return;
-        // What this screen size leaves out, read once per click — so a
+    const fire = (trigger) => {
+        // What this screen size leaves out, read once per press — so a
         // media query that changes it takes effect on the next one.
         const skip = skippedBy(trigger);
         currentTrigger = trigger;
@@ -212,7 +214,56 @@ export function initTargetFunctions() {
             .filter((command) => !skip.some((entry) => skips(entry, command)))
             .forEach(run);
         currentTrigger = null;
+    };
+    const onClick = (event) => {
+        if (live !== self)
+            return;
+        const trigger = event.target?.closest(`[${TRIGGER}]`);
+        if (!trigger)
+            return;
+        fire(trigger);
         syncAria();
+    };
+    /*
+     * #id in the address: open the closed targets it is in, outermost
+     * first, each through the button that opens it — so a tab closes its
+     * siblings as a click would. A target no button opens simply opens.
+     * Then go to it: the browser could not, while it was closed.
+     */
+    const openFromHash = () => {
+        if (live !== self)
+            return;
+        let id = location.hash.slice(1);
+        try {
+            id = decodeURIComponent(id);
+        }
+        catch {
+            // A malformed escape: look the id up as it is written.
+        }
+        const found = id ? document.getElementById(id) : null;
+        if (!found)
+            return;
+        const closed = [];
+        for (let el = found.closest(`[${TARGET}]`); el; el = el.parentElement?.closest(`[${TARGET}]`) ?? null) {
+            if (!isActive(el))
+                closed.unshift(el);
+        }
+        if (!closed.length)
+            return;
+        const triggers = Array.from(document.querySelectorAll(`[${TRIGGER}]`));
+        for (const target of closed) {
+            const names = namesOf(target);
+            const trigger = triggers.find((t) => {
+                const name = ownTarget(t);
+                return name !== null && names.includes(name);
+            });
+            if (trigger)
+                fire(trigger);
+            else
+                setActive(target, true);
+        }
+        syncAria();
+        found.scrollIntoView();
     };
     /* Escape closes the dialog-like target opened last, by its first name
        so anything sharing that name (a backdrop) closes with it. */
@@ -229,10 +280,13 @@ export function initTargetFunctions() {
     };
     document.addEventListener("click", onClick);
     document.addEventListener("keydown", onKeydown);
+    addEventListener("hashchange", openFromHash);
     syncAria();
+    openFromHash();
     return () => {
         document.removeEventListener("click", onClick);
         document.removeEventListener("keydown", onKeydown);
+        removeEventListener("hashchange", openFromHash);
         if (live === self)
             live = null;
     };

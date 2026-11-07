@@ -10,7 +10,7 @@ state. One file, no dependencies, framework-agnostic.
 ```
 
 ```sh
-npm install github:omisilli/target-functions#v3.1.0
+npm install github:omisilli/target-functions#v3.2.0
 ```
 
 ```ts
@@ -28,17 +28,17 @@ by double-clicking:
 ```html
 <link
     rel="stylesheet"
-    href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.1.0/index.css"
+    href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.2.0/index.css"
 />
 
 <script type="module">
-    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.1.0/dist/index.js";
+    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.2.0/dist/index.js";
 
     initTargetFunctions();
 </script>
 ```
 
-Pin the version (`@v3.1.0`) on a live site. A pinned URL never changes;
+Pin the version (`@v3.2.0`) on a live site. A pinned URL never changes;
 `@3` follows the newest 3.x release.
 
 ## Files
@@ -227,6 +227,45 @@ open on a computer is still open on a phone. A copy that is hidden with
 Escape and focus moves are kept for dialog-like targets (scroll lock), so
 an accordion behaves like an accordion: Escape does not close it.
 
+## Tabs, and an address that opens one
+
+A tab bar is the accordion's one-at-a-time, with `open` instead of
+`toggle` — a tab pressed twice stays open:
+
+```html
+<button data-pg-target-functions="close-tab-except-t1 open-t1" aria-controls="policies">Policies</button>
+<button data-pg-target-functions="close-tab-except-t2 open-t2" aria-controls="procedures">Procedures</button>
+
+<div id="policies"   data-pg-target="t1 tab" data-pg-target-active="true">…</div>
+<div id="procedures" data-pg-target="t2 tab" data-pg-target-active="false">…</div>
+```
+
+```css
+.tab[aria-expanded="true"] {
+    border-bottom-color: currentColor;
+}
+.tab-panel[data-pg-target-active="false"] {
+    display: none;
+}
+```
+
+- **No `#` in the address:** the markup's state stands. Write the first
+  panel open, as above, and the first tab shows.
+- **`…/page#procedures`:** the panel with that id opens — through the
+  button that opens it, so `close-tab-except-t2` closes the other tabs as a
+  click would. Then the page goes to it, as the browser does with any
+  `#id`; it could not while the panel was closed.
+- **An id inside a closed target works too:** `#refunds`, a paragraph in a
+  closed tab or a closed accordion answer, opens what it is in — tabs
+  within tabs from the outside in — then goes to the paragraph.
+- **A link on the page** to `#procedures` does the same: it runs on load and
+  whenever the hash changes, so Back and Forward follow along.
+- **A target no button opens** simply opens.
+
+A tab that is a button leaves the address as it is. To write it there, so
+the tab can be shared, let the anchor package write it — its "Tabs"
+section.
+
 ## Scroll lock
 
 While a `data-pg-target-scroll-lock="true"` target is open, the page stays
@@ -285,13 +324,13 @@ change it afterwards; from then on targetFunctions owns it. If a re-render write
 different value, React wins and the state is lost.
 
 See [`examples/react/Example.tsx`](examples/react/Example.tsx) — the drawer,
-an accordion, `except` on chips, and a site's footer. A plain HTML version is in
+an accordion, `except` on chips, a site's footer, and tabs. A plain HTML version is in
 [`examples/static/index.html`](examples/static/index.html): every command, a
 drawer and a search, an accordion (one at a time on a computer, any number
 on a phone), two columns on a computer and one on a phone, a footer open on
 a computer and an accordion on a phone — the page's own, at its bottom:
-five columns, one open at a time, an arrow turning as one opens — and
-`except` on chips.
+five columns, one open at a time, an arrow turning as one opens —
+`except` on chips, and tabs that `#procedures` in the address opens.
 
 ## Limits
 

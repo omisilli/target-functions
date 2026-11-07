@@ -154,3 +154,51 @@ export function SiteFooter() {
         </footer>
     );
 }
+
+/*
+ * Tabs: one panel at a time — close-tab-except-t2 open-t2. Open, not
+ * toggle: a tab pressed twice stays open. The first panel is written open,
+ * so an address without a # shows it; with #procedures that panel opens
+ * instead, through its tab's own commands, and the page goes to it. The
+ * CSS:
+ *
+ *   .tab[aria-expanded="true"] { border-bottom-color: currentColor; }
+ *   .tab-panel[data-pg-target-active="false"] { display: none; }
+ *
+ * JSX writes only the starting state; targetFunctions owns it from then on.
+ */
+const tabs = [
+    { id: "policies", name: "t1", title: "Policies", text: "The first tab — open in the markup." },
+    { id: "procedures", name: "t2", title: "Procedures", text: "Reached by #procedures in the address." },
+    { id: "notices", name: "t3", title: "Notices", text: "Reached by #notices." },
+];
+
+export function Tabs() {
+    return (
+        <div className="tabs">
+            <div className="tab-list">
+                {tabs.map(({ id, name, title }) => (
+                    <button
+                        key={id}
+                        className="tab"
+                        data-pg-target-functions={`close-tab-except-${name} open-${name}`}
+                        aria-controls={id}
+                    >
+                        {title}
+                    </button>
+                ))}
+            </div>
+            {tabs.map(({ id, name, text }, i) => (
+                <div
+                    key={id}
+                    className="tab-panel"
+                    id={id}
+                    data-pg-target={`${name} tab`}
+                    data-pg-target-active={i === 0 ? "true" : "false"}
+                >
+                    <p>{text}</p>
+                </div>
+            ))}
+        </div>
+    );
+}

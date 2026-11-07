@@ -7,7 +7,7 @@
         <title>targetFunctions — example</title>
         <link
             rel="stylesheet"
-            href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.1.0/index.css"
+            href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.2.0/index.css"
         />
         <style>
             :root {
@@ -22,6 +22,9 @@
                 --shadow: 0 12px 40px rgb(0 0 0 / 0.12);
                 --ease: cubic-bezier(0.22, 1, 0.36, 1);
                 color-scheme: light dark;
+
+                /* An #id in the address lands below the sticky top bar. */
+                scroll-padding-top: 5rem;
             }
             @media (prefers-color-scheme: dark) {
                 :root {
@@ -438,6 +441,48 @@
                 background: var(--code-bg);
             }
 
+            /* Tabs: one panel at a time. The open tab is the one whose
+               button is aria-expanded — targetFunctions keeps that. */
+            .tabs {
+                border: 1px solid var(--line);
+                border-radius: 0.9rem;
+                background: var(--surface);
+                overflow: hidden;
+            }
+            .tab-list {
+                display: flex;
+                overflow-x: auto;
+                scrollbar-width: none;
+                border-bottom: 1px solid var(--line);
+            }
+            .tab {
+                flex: none;
+                padding: 0.75rem 1.1rem;
+                border: 0;
+                border-bottom: 2px solid transparent;
+                background: none;
+                color: var(--muted);
+            }
+            .tab[aria-expanded="true"] {
+                color: var(--fg);
+                border-bottom-color: var(--accent);
+            }
+            .tab-panel {
+                padding: 1.25rem;
+            }
+            .tab-panel[data-pg-target-active="false"] {
+                display: none;
+            }
+            .tab-panel p + p {
+                margin-top: 0.75rem;
+            }
+            .links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 1rem;
+            }
+
             /* Search: drops from the top */
             .search {
                 position: fixed;
@@ -660,6 +705,42 @@
                 </div>
             </div>
 
+            <h2>Tabs — and an address that opens one</h2>
+            <p class="lead small">
+                Each tab: <code>close-tab-except-t2 open-t2</code> — close every panel but its own, then open its own.
+                Open, not toggle: a tab pressed twice stays open. The first panel is written open in the markup, so
+                with no <code>#</code> in the address the first tab shows. With one, the panel of that id opens
+                instead — <code>…/index.html#procedures</code> — through its own tab's commands, so the others
+                close as they would on a click; then the page goes to it. A link on the page to
+                <code>#procedures</code> does the same.
+            </p>
+            <div class="tabs">
+                <div class="tab-list">
+                    <button class="tab" data-pg-target-functions="close-tab-except-t1 open-t1" aria-controls="policies">Policies</button>
+                    <button class="tab" data-pg-target-functions="close-tab-except-t2 open-t2" aria-controls="procedures">Procedures</button>
+                    <button class="tab" data-pg-target-functions="close-tab-except-t3 open-t3" aria-controls="notices">Notices</button>
+                </div>
+                <div class="tab-panel" id="policies" data-pg-target="t1 tab" data-pg-target-active="true">
+                    <p>The first tab — open in the markup, so it is what an address without a <code>#</code> shows.</p>
+                    <p>Its panel's id is <code>policies</code>: <code>#policies</code> in the address opens it again, wherever the reader left off.</p>
+                </div>
+                <div class="tab-panel" id="procedures" data-pg-target="t2 tab" data-pg-target-active="false">
+                    <p>The second tab. Reached by <code>#procedures</code> — try the link below, or open the page with it in a new tab.</p>
+                </div>
+                <div class="tab-panel" id="notices" data-pg-target="t3 tab" data-pg-target-active="false">
+                    <p>The third tab, <code>#notices</code>.</p>
+                </div>
+            </div>
+            <div class="links">
+                <a class="btn" href="#procedures">Link to #procedures</a>
+                <a class="btn" href="#notices">Link to #notices</a>
+                <a class="btn" href="#notices" target="_blank">This page with #notices, in a new tab</a>
+            </div>
+            <p class="lead small">
+                A tab is a button, so pressing one leaves the address as it is. To write it there too, so it can be
+                shared, add the anchor package to the tab — its README's "Tabs" section shows how.
+            </p>
+
             <h2>A footer — open on a computer, an accordion on a phone</h2>
             <p class="lead small">
                 At the bottom of this page. On a computer, five open columns, and their titles are no buttons: CSS
@@ -845,7 +926,7 @@
         </div>
 
         <script type="module">
-            import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.1.0/dist/index.js";
+            import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.2.0/dist/index.js";
 
             // No locker to wire up: index.css keeps the page still while a
             // data-pg-target-scroll-lock target is open.

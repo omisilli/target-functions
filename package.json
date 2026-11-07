@@ -1,6 +1,6 @@
 {
     "name": "@plusguard/target-functions",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "description": "Open, close and toggle elements by name from HTML attributes, with a CSS scroll lock for drawers and overlays. Zero dependencies, framework-agnostic, accessible.",
     "type": "module",
     "main": "./dist/index.js",
