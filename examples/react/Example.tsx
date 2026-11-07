@@ -41,6 +41,10 @@ export function Example() {
  * its own — "close-faq-except-s1 toggle-s1". On a phone, any number stay
  * open: the CSS leaves the close out there.
  *
+ * data-pg-anchor-stay (the anchor package, mounted once): the question
+ * pressed keeps its place on screen while the answer above it closes,
+ * instead of riding up with it.
+ *
  *   @media (width < 48rem) {
  *       .faq { --pg-target-skip: close-faq; }
  *   }
@@ -60,7 +64,7 @@ const questions = [
 
 export function Accordion() {
     return (
-        <div className="faq">
+        <div className="faq" data-pg-anchor-stay>
             {questions.map(({ id, q, a }) => (
                 <div key={id}>
                     {/* JSX sets the starting state; targetFunctions owns it after. */}

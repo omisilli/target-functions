@@ -178,6 +178,20 @@ the others — except its own.
 sizes](#screen-sizes)). Any number everywhere: leave out the
 `close-faq-except-…`.
 
+**The question pressed stays put — with the anchor package.** One at a
+time, the answer that closes may be above the question pressed: as it
+closes, everything below rides up with it — off the top of a phone's
+screen, if that answer was long. `data-pg-anchor-stay` on the accordion
+(anchor 3.1 and later) keeps the question pressed where it is on the
+screen, frame by frame, while the page above it changes:
+
+```html
+<div class="faq" data-pg-anchor-stay>…</div>
+```
+
+targetFunctions only opens and closes; keeping the reader's place is a
+scroll, and scrolling is anchor's. See its "Accordions" section.
+
 **The opening, in CSS — no measuring.** The answer is a one-row grid whose
 row grows from `0fr` to `1fr`; the extra `<div>` inside is what is
 measured, by the browser. Content that changes later — a font loading, a

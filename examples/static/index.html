@@ -1,5 +1,6 @@
 <!doctype html>
-<!-- Open by double-clicking: the module loads from jsDelivr, not from ../dist. -->
+<!-- Open by double-clicking: the module loads from jsDelivr, not from ../dist.
+     The accordions also load the anchor package, for data-pg-anchor-stay. -->
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -627,7 +628,13 @@
                 close out, so any number stay open. The opening is CSS: a grid row from <code>0fr</code> to
                 <code>1fr</code>, nothing measured. Narrow the window to see the phone's way.
             </p>
-            <div class="acc single">
+            <p class="lead small">
+                Open the first, scroll down a little, press the second: the first closes above it over half a
+                second, and without help the question you pressed would ride up with it — off the screen, when
+                the answer above is long. <code>data-pg-anchor-stay</code> on the accordion (the anchor package)
+                keeps the question you pressed where it is while the page above it changes.
+            </p>
+            <div class="acc single" data-pg-anchor-stay>
                 <div>
                     <button class="btn acc-head" data-pg-target-functions="close-faq-except-s1 toggle-s1" aria-controls="s1">What is a target?</button>
                     <div class="acc-body" id="s1" data-pg-target="s1 faq" data-pg-target-active="false">
@@ -661,7 +668,7 @@
                 close together — open one, narrow the window: it is still open. One at a time, in their own
                 group: <code>close-cols-except-c1 toggle-c1</code>.
             </p>
-            <div class="cols">
+            <div class="cols" data-pg-anchor-stay>
                 <div class="acc left">
                 <div class="odd">
                     <button class="btn acc-head" data-pg-target-functions="close-cols-except-c1 toggle-c1" aria-controls="c1">Is it one script?</button>
@@ -795,7 +802,7 @@
              62rem. Each title: close every column but its own, then flip its
              own. -->
         <footer class="site-foot">
-            <div class="sf-cols">
+            <div class="sf-cols" data-pg-anchor-stay>
                 <div>
                     <h3>
                         <button class="sf-head" data-pg-target-functions="close-foot-except-f1 toggle-f1" aria-controls="f1">
@@ -927,10 +934,14 @@
 
         <script type="module">
             import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.2.0/dist/index.js";
+            import { initAnchor } from "https://cdn.jsdelivr.net/gh/omisilli/anchor@v3.1.0/dist/index.js";
 
             // No locker to wire up: index.css keeps the page still while a
             // data-pg-target-scroll-lock target is open.
             initTargetFunctions();
+            // data-pg-anchor-stay: a question pressed stays in place while
+            // the answer above it closes.
+            initAnchor();
         </script>
     </body>
 </html>
