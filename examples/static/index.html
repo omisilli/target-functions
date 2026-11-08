@@ -267,9 +267,11 @@
 
             /* The page's footer — open columns on a computer, an accordion
                below 62rem (992px), one at a time at every width. */
+            /* In the page's colours: light in light, dark in dark. */
             .site-foot {
-                background: #252525;
-                color: #fff;
+                background: var(--surface);
+                color: var(--fg);
+                border-top: 1px solid var(--line);
                 padding: 45px 28px;
             }
             .sf-cols {
@@ -319,10 +321,11 @@
             }
             .sf-body a {
                 font-size: 14px;
-                color: rgb(255 255 255 / 0.7);
+                color: var(--muted);
                 text-decoration: none;
             }
             .sf-body a:hover {
+                color: var(--fg);
                 text-decoration: underline;
             }
             /* A computer: titles, not buttons — every column open. */
