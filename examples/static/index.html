@@ -343,6 +343,10 @@
                     display: flex;
                     flex-direction: column;
                 }
+                /* A thin line between the titles, in the page's colours. */
+                .sf-cols > div + div {
+                    border-top: 1px solid var(--line);
+                }
                 .sf-head {
                     padding: 20px 0 16px;
                 }
