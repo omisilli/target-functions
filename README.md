@@ -10,7 +10,7 @@ state. One file, no dependencies, framework-agnostic.
 ```
 
 ```sh
-npm install github:omisilli/target-functions#v3.2.0
+npm install @plusguard/target-functions
 ```
 
 ```ts
@@ -28,17 +28,17 @@ by double-clicking:
 ```html
 <link
     rel="stylesheet"
-    href="https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.2.0/index.css"
+    href="https://cdn.jsdelivr.net/npm/@plusguard/target-functions@3.2.1/index.css"
 />
 
 <script type="module">
-    import { initTargetFunctions } from "https://cdn.jsdelivr.net/gh/omisilli/target-functions@v3.2.0/dist/index.js";
+    import { initTargetFunctions } from "https://cdn.jsdelivr.net/npm/@plusguard/target-functions@3.2.1/dist/index.js";
 
     initTargetFunctions();
 </script>
 ```
 
-Pin the version (`@v3.2.0`) on a live site. A pinned URL never changes;
+Pin the version (`@3.2.1`) on a live site. A pinned URL never changes;
 `@3` follows the newest 3.x release.
 
 ## Files
